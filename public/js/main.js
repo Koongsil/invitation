@@ -51,9 +51,14 @@
   });
 
   // ---------- 연락하기 ----------
-  $('#call-groom').href = 'tel:' + C.groom.phone;
-  $('#call-bride').href = 'tel:' + C.bride.phone;
-  $('#venue-tel').href = 'tel:' + C.venue.tel;
+  [
+    ['#call-groom', C.groom.phone],
+    ['#call-bride', C.bride.phone],
+    ['#venue-tel', C.venue.tel],
+  ].forEach(function (item) {
+    var el = $(item[0]);
+    if (el) el.href = 'tel:' + item[1];
+  });
 
   // ---------- 달력 / D-day ----------
   (function renderCalendar() {

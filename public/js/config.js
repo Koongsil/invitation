@@ -6,15 +6,15 @@
 window.INVITATION = {
   groom: {
     name: "김성호",
-    father: "김아버지",
-    mother: "이어머니",
+    father: "김영구",
+    mother: "남정희",
     relation: "장남",
     phone: "010-0000-0000",
   },
   bride: {
     name: "이서용",
-    father: "이아버지",
-    mother: "박어머니",
+    father: "이송섭",
+    mother: "소숙희",
     relation: "장녀",
     phone: "010-0000-0000",
   },
