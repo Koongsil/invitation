@@ -36,14 +36,14 @@
   function fillPhoto(el, src) {
     el.dataset.path = src;
     el.classList.add('is-empty');
+    // lazy 이미지는 DOM에 붙어 있어야 로드되므로 먼저 붙이고, 로드되면 자리 표시를 걷어낸다
     var img = new Image();
     img.alt = '';
     img.loading = 'lazy';
-    img.onload = function () {
-      el.classList.remove('is-empty');
-      el.appendChild(img);
-    };
+    img.onload = function () { el.classList.remove('is-empty'); };
+    img.onerror = function () { img.remove(); };
     img.src = src;
+    el.appendChild(img);
   }
 
   $$('[data-img]').forEach(function (el) {

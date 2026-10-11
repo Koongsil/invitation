@@ -67,6 +67,10 @@ button {
   object-fit: cover;
 }
 
+.photo.is-empty img {
+  opacity: 0;
+}
+
 .photo.is-empty::after {
   content: attr(data-label) '\A' attr(data-path);
   white-space: pre;
