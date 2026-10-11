@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>모바일 청첩장</title>
+    <meta name="description" content="저희 결혼합니다." />
+
+    <!-- 카카오톡/문자 공유 미리보기 (배포 후 실제 URL과 이미지로 변경) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="김성호 ♥ 이서용 결혼합니다" />
+    <meta
+      property="og:description"
+      content="2027년 1월 23일 토요일 낮 11시 00분"
+    />
+    <meta property="og:image" content="images/og.jpg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <main class="invitation">
+      <!-- 1. 메인 커버 -->
+      <section class="cover">
+        <div
+          class="photo photo--cover"
+          data-img="main"
+          data-label="메인 사진"
+        ></div>
+        <div class="cover__text">
+          <p class="cover__eyebrow">WEDDING INVITATION</p>
+          <h1 class="cover__names">
+            <span data-bind="groom.name"></span>
+            <span class="cover__amp">&amp;</span>
+            <span data-bind="bride.name"></span>
+          </h1>
+          <p class="cover__info">
+            <span data-bind="dateLong"></span><br />
+            <span data-bind="venue.name"></span>
+            <span data-bind="venue.hall"></span>
+          </p>
+        </div>
+      </section>
+
+      <!-- 2. 인사말 -->
+      <section class="section greeting">
+        <p class="section__eyebrow">INVITATION</p>
+        <h2 class="section__title">소중한 분들을 초대합니다</h2>
+        <div class="greeting__message" id="greeting-message"></div>
+        <div class="greeting__families">
+          <p>
+            <span data-bind="groom.father"></span> ·
+            <span data-bind="groom.mother"></span>
+            <small>의 <span data-bind="groom.relation"></span></small>
+            <strong data-bind="groom.name"></strong>
+          </p>
+          <p>
+            <span data-bind="bride.father"></span> ·
+            <span data-bind="bride.mother"></span>
+            <small>의 <span data-bind="bride.relation"></span></small>
+            <strong data-bind="bride.name"></strong>
+          </p>
+        </div>
+        <div
+          class="photo photo--landscape"
+          data-img="greeting"
+          data-label="인사말 사진"
+        ></div>
+        <div class="contact">
+          <a class="btn btn--outline" id="call-groom">신랑에게 연락하기</a>
+          <a class="btn btn--outline" id="call-bride">신부에게 연락하기</a>
+        </div>
+      </section>
+
+      <!-- 3. 예식 일시 / 달력 -->
+      <section class="section section--tinted calendar">
+        <p class="section__eyebrow">WEDDING DAY</p>
+        <h2 class="section__title" data-bind="dateLong"></h2>
+        <div class="calendar__grid" id="calendar"></div>
+        <p class="calendar__dday" id="dday"></p>
+      </section>
+
+      <!-- 4. 갤러리 -->
+      <section class="section gallery">
+        <p class="section__eyebrow">GALLERY</p>
+        <h2 class="section__title">우리의 순간들</h2>
+        <div class="gallery__grid" id="gallery"></div>
+      </section>
+
+      <!-- 5. 오시는 길 -->
+      <section class="section section--tinted location">
+        <p class="section__eyebrow">LOCATION</p>
+        <h2 class="section__title">오시는 길</h2>
+        <p class="location__venue">
+          <strong data-bind="venue.name"></strong>
+          <span data-bind="venue.hall"></span><br />
+          <span data-bind="venue.address"></span><br />
+          <a class="location__tel" id="venue-tel" data-bind="venue.tel"></a>
+        </p>
+        <div
+          class="photo photo--map"
+          data-img="map"
+          data-label="지도 이미지"
+        ></div>
+        <div class="location__apps">
+          <a class="btn btn--app" id="link-naver" target="_blank" rel="noopener"
+            >네이버 지도</a
+          >
+          <a class="btn btn--app" id="link-kakao" target="_blank" rel="noopener"
+            >카카오맵</a
+          >
+          <a class="btn btn--app" id="link-tmap" target="_blank" rel="noopener"
+            >티맵</a
+          >
+        </div>
+        <button class="btn btn--text" id="copy-address" type="button">
+          주소 복사하기
+        </button>
+        <dl class="location__transport" id="transport"></dl>
+      </section>
+
+      <!-- 6. 마음 전하실 곳 -->
+      <section class="section account">
+        <p class="section__eyebrow">ACCOUNT</p>
+        <h2 class="section__title">마음 전하실 곳</h2>
+        <p class="section__desc">
+          참석이 어려우신 분들을 위해 기재했습니다.<br />너그러운 마음으로 양해
+          부탁드립니다.
+        </p>
+        <div class="accordion" data-side="groom">
+          <button class="accordion__head" type="button">신랑측 계좌번호</button>
+          <div class="accordion__body"></div>
+        </div>
+        <div class="accordion" data-side="bride">
+          <button class="accordion__head" type="button">신부측 계좌번호</button>
+          <div class="accordion__body"></div>
+        </div>
+      </section>
+
+      <!-- 7. 마무리 -->
+      <section class="ending">
+        <div
+          class="photo photo--ending"
+          data-img="ending"
+          data-label="마지막 사진"
+        ></div>
+        <p class="ending__text">함께해 주셔서 감사합니다</p>
+        <button class="btn btn--outline" id="share-link" type="button">
+          청첩장 링크 복사하기
+        </button>
+      </section>
+
+      <footer class="footer">Thank you</footer>
+    </main>
+
+    <!-- 갤러리 라이트박스 -->
+    <div class="lightbox" id="lightbox" hidden>
+      <button class="lightbox__close" type="button" aria-label="닫기">
+        &times;
+      </button>
+      <button
+        class="lightbox__nav lightbox__nav--prev"
+        type="button"
+        aria-label="이전"
+      >
+        &#8249;
+      </button>
+      <div class="lightbox__stage"></div>
+      <button
+        class="lightbox__nav lightbox__nav--next"
+        type="button"
+        aria-label="다음"
+      >
+        &#8250;
+      </button>
+      <p class="lightbox__count"></p>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
