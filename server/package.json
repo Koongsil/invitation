@@ -1,0 +1,12 @@
+{
+  "name": "invitation-guestbook",
+  "private": true,
+  "description": "모바일 청첩장 방명록 API (Vercel + MongoDB Atlas)",
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file=.env dev.js"
+  },
+  "dependencies": {
+    "mongodb": "6.10.0"
+  }
+}

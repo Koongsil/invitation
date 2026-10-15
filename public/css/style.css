@@ -88,7 +88,6 @@ button {
 
 .photo--cover { aspect-ratio: 3 / 4; }
 .photo--landscape { aspect-ratio: 4 / 3; margin-top: 40px; }
-.photo--map { aspect-ratio: 4 / 3; margin: 24px 0 16px; }
 .photo--ending { aspect-ratio: 3 / 4; }
 
 /* ---------- 공통 섹션 ---------- */
@@ -299,6 +298,21 @@ button {
   color: var(--text-sub);
 }
 
+.map {
+  aspect-ratio: 4 / 3;
+  margin: 24px 0 16px;
+  background: var(--placeholder);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.map iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 .location__apps {
   display: flex;
   gap: 6px;
@@ -385,7 +399,125 @@ button {
   border-radius: 6px;
 }
 
-/* ---------- 7. 마무리 ---------- */
+/* ---------- 7. 방명록 ---------- */
+.guestbook__form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.guestbook__row {
+  display: flex;
+  gap: 8px;
+}
+
+.guestbook__row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.guestbook__form input,
+.guestbook__form textarea {
+  font: inherit;
+  font-size: 14px;
+  color: var(--text);
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.guestbook__form input:focus,
+.guestbook__form textarea:focus {
+  border-color: var(--accent);
+}
+
+.guestbook__form textarea {
+  resize: none;
+  line-height: 1.6;
+}
+
+.guestbook__hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.guestbook__list {
+  list-style: none;
+  margin-top: 28px;
+  text-align: left;
+}
+
+.guestbook__item {
+  padding: 16px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.guestbook__item + .guestbook__item {
+  margin-top: 8px;
+}
+
+.guestbook__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.guestbook__meta strong {
+  font-weight: 500;
+}
+
+.guestbook__meta span {
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+.guestbook__delete {
+  margin-left: auto;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--text-sub);
+  padding: 0 2px;
+}
+
+.guestbook__message {
+  margin-top: 8px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.guestbook__empty {
+  margin-top: 28px;
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.guestbook__more {
+  width: 100%;
+  margin-top: 16px;
+}
+
+/* ---------- 8. 마무리 ---------- */
 .ending {
   text-align: center;
   padding-bottom: 56px;

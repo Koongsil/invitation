@@ -101,11 +101,7 @@
           <span data-bind="venue.address"></span><br />
           <a class="location__tel" id="venue-tel" data-bind="venue.tel"></a>
         </p>
-        <div
-          class="photo photo--map"
-          data-img="map"
-          data-label="지도 이미지"
-        ></div>
+        <div class="map" id="map"></div>
         <div class="location__apps">
           <a class="btn btn--app" id="link-naver" target="_blank" rel="noopener"
             >네이버 지도</a
@@ -141,7 +137,26 @@
         </div>
       </section>
 
-      <!-- 7. 마무리 -->
+      <!-- 7. 방명록 -->
+      <section class="section section--tinted guestbook" id="guestbook" hidden>
+        <p class="section__eyebrow">GUESTBOOK</p>
+        <h2 class="section__title">방명록</h2>
+        <p class="section__desc">두 사람에게 축하의 마음을 남겨주세요.</p>
+        <form class="guestbook__form" id="guestbook-form" novalidate>
+          <div class="guestbook__row">
+            <input name="name" type="text" placeholder="이름" maxlength="20" autocomplete="name" required />
+            <input name="password" type="password" placeholder="비밀번호 (삭제 시 필요)" minlength="4" maxlength="30" autocomplete="new-password" required />
+          </div>
+          <textarea name="message" rows="4" placeholder="축하 메시지를 남겨주세요" maxlength="500" required></textarea>
+          <input class="guestbook__hp" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <button class="btn btn--primary" type="submit">작성하기</button>
+        </form>
+        <ul class="guestbook__list" id="guestbook-list"></ul>
+        <p class="guestbook__empty" id="guestbook-empty" hidden>첫 번째 축하 메시지를 남겨주세요.</p>
+        <button class="btn btn--outline guestbook__more" id="guestbook-more" type="button" hidden>더보기</button>
+      </section>
+
+      <!-- 8. 마무리 -->
       <section class="ending">
         <div
           class="photo photo--ending"

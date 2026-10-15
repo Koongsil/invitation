@@ -20,13 +20,18 @@ window.INVITATION = {
   },
 
   // 예식 일시 (24시간제)
-  date: "2027-01-23T11:00:00",
+  date: "2027-01-23T11:10:00",
 
   venue: {
     name: "더뉴컨벤션웨딩홀",
     hall: "1층 르노브홀",
-    address: "서울특별시 강서구 공항대로36길 57 (내발산동)",
+    address: "서울특별시 강서구 공항대로36길 57",
     tel: "1661-3303",
+    // 구글 지도: Maps Embed API 키 (비워두면 키 없는 기본 임베드로 표시)
+    // 공개 저장소에 올라가므로 Google Cloud 콘솔에서 반드시 HTTP 리퍼러 제한을 걸어주세요
+    googleMapsApiKey: "",
+    // 지도에서 검색할 값 (비워두면 address 사용)
+    mapQuery: "",
     naverMap: "https://map.naver.com/",
     kakaoMap: "https://map.kakao.com/",
     tmap: "https://tmap.life/",
@@ -51,7 +56,6 @@ window.INVITATION = {
   images: {
     main: "images/main.jpg", // 메인 커버 (세로 3:4 권장)
     greeting: "images/greeting.jpg", // 인사말 아래 사진 (가로 4:3 권장)
-    map: "images/map.jpg", // 지도 캡처 이미지
     ending: "images/ending.jpg", // 마지막 사진
     // 갤러리 (개수 자유롭게 추가/삭제)
     gallery: [
@@ -66,6 +70,10 @@ window.INVITATION = {
       "images/gallery/09.jpg",
     ],
   },
+
+  // 방명록 API 주소 (server/ 의 Cloudflare Worker 배포 주소, 비워두면 방명록 숨김)
+  // 예: "https://invitation-guestbook.<계정>.workers.dev"
+  guestbookApi: "",
 
   accounts: {
     groom: [

@@ -148,6 +148,20 @@
   });
 
   // ---------- 오시는 길 ----------
+  (function renderMap() {
+    var q = encodeURIComponent(C.venue.mapQuery || C.venue.address);
+    var src = C.venue.googleMapsApiKey
+      ? 'https://www.google.com/maps/embed/v1/place?key=' + C.venue.googleMapsApiKey + '&q=' + q + '&language=ko&region=KR&zoom=16'
+      : 'https://maps.google.com/maps?q=' + q + '&hl=ko&z=16&output=embed';
+    var iframe = document.createElement('iframe');
+    iframe.src = src;
+    iframe.title = C.venue.name + ' 지도';
+    iframe.loading = 'lazy';
+    iframe.referrerPolicy = 'no-referrer-when-downgrade';
+    iframe.allowFullscreen = true;
+    $('#map').appendChild(iframe);
+  })();
+
   $('#link-naver').href = C.venue.naverMap;
   $('#link-kakao').href = C.venue.kakaoMap;
   $('#link-tmap').href = C.venue.tmap;
@@ -178,6 +192,106 @@
       acc.classList.toggle('is-open');
     });
   });
+
+  // ---------- 방명록 ----------
+  (function initGuestbook() {
+    if (!C.guestbookApi) return;
+    var api = C.guestbookApi.replace(/\/+$/, '') + '/api/guestbook';
+    var form = $('#guestbook-form');
+    var listEl = $('#guestbook-list');
+    var moreBtn = $('#guestbook-more');
+    var cursor = null;
+
+    $('#guestbook').hidden = false;
+
+    function request(method, url, body) {
+      return fetch(url, {
+        method: method,
+        headers: body ? { 'Content-Type': 'application/json' } : undefined,
+        body: body ? JSON.stringify(body) : undefined,
+      }).then(function (res) {
+        return res.json().catch(function () { return {}; }).then(function (data) {
+          if (!res.ok) throw new Error(data.error || '잠시 후 다시 시도해 주세요.');
+          return data;
+        });
+      });
+    }
+
+    function formatDate(iso) {
+      var d = new Date(iso);
+      return d.getFullYear() + '.' + pad(d.getMonth() + 1) + '.' + pad(d.getDate());
+    }
+
+    function pad(n) { return n < 10 ? '0' + n : String(n); }
+
+    function renderItem(item) {
+      var li = document.createElement('li');
+      li.className = 'guestbook__item';
+      li.innerHTML =
+        '<div class="guestbook__meta"><strong>' + escapeHtml(item.name) + '</strong>' +
+        '<span>' + formatDate(item.createdAt) + '</span>' +
+        '<button class="guestbook__delete" type="button" aria-label="삭제">&times;</button></div>' +
+        '<p class="guestbook__message">' + escapeHtml(item.message) + '</p>';
+      $('.guestbook__delete', li).addEventListener('click', function () {
+        var pw = prompt('작성 시 입력한 비밀번호를 입력해 주세요.');
+        if (!pw) return;
+        request('DELETE', api + '/' + item.id, { password: pw })
+          .then(function () {
+            li.remove();
+            updateEmpty();
+            toast('삭제되었습니다.');
+          })
+          .catch(function (err) { toast(err.message); });
+      });
+      return li;
+    }
+
+    function updateEmpty() {
+      $('#guestbook-empty').hidden = listEl.children.length > 0;
+    }
+
+    function load() {
+      moreBtn.disabled = true;
+      request('GET', api + (cursor ? '?cursor=' + cursor : ''))
+        .then(function (data) {
+          data.items.forEach(function (item) { listEl.appendChild(renderItem(item)); });
+          cursor = data.nextCursor;
+          moreBtn.hidden = !cursor;
+          updateEmpty();
+        })
+        .catch(function (err) { toast(err.message); })
+        .then(function () { moreBtn.disabled = false; });
+    }
+
+    moreBtn.addEventListener('click', load);
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var body = {
+        name: form.name.value.trim(),
+        password: form.password.value,
+        message: form.message.value.trim(),
+        website: form.website.value,
+      };
+      if (!body.name) return toast('이름을 입력해 주세요.');
+      if (body.password.length < 4) return toast('비밀번호를 4자 이상 입력해 주세요.');
+      if (!body.message) return toast('축하 메시지를 입력해 주세요.');
+
+      var submit = $('button[type="submit"]', form);
+      submit.disabled = true;
+      request('POST', api, body)
+        .then(function (data) {
+          listEl.insertBefore(renderItem(data.item), listEl.firstChild);
+          form.reset();
+          updateEmpty();
+          toast('방명록이 등록되었습니다.');
+        })
+        .catch(function (err) { toast(err.message); })
+        .then(function () { submit.disabled = false; });
+    });
+
+    load();
+  })();
 
   // ---------- 공유 ----------
   $('#share-link').addEventListener('click', function () {

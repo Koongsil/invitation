@@ -1,0 +1,11 @@
+{
+  "name": "invitation",
+  "private": true,
+  "description": "모바일 청첩장",
+  "scripts": {
+    "dev": "browser-sync start --server public --files \"public/**/*\" --port 3000 --no-notify"
+  },
+  "devDependencies": {
+    "browser-sync": "3.0.3"
+  }
+}
