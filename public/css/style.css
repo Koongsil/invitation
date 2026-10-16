@@ -88,7 +88,6 @@ button {
 
 .photo--cover { aspect-ratio: 3 / 4; }
 .photo--landscape { aspect-ratio: 4 / 3; margin-top: 40px; }
-.photo--ending { aspect-ratio: 3 / 4; }
 .photo--map { aspect-ratio: 1030 / 886; }
 .photo--direction { aspect-ratio: 2000 / 1994; }
 
@@ -300,21 +299,6 @@ button {
   color: var(--text-sub);
 }
 
-.map {
-  aspect-ratio: 4 / 3;
-  margin: 24px 0 16px;
-  background: var(--placeholder);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.map iframe {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-
 .location__apps {
   display: flex;
   gap: 6px;
@@ -339,7 +323,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 36px;
+  margin: 24px 0 16px;
 }
 
 .location__guide {
@@ -422,14 +406,18 @@ button {
   text-align: left;
 }
 
-.guestbook__row {
+.guestbook__from {
   display: flex;
+  align-items: center;
+  justify-content: flex-end;
   gap: 8px;
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--text-sub);
 }
 
-.guestbook__row input {
-  flex: 1;
-  min-width: 0;
+.guestbook__from input {
+  width: 45%;
 }
 
 .guestbook__form input,
@@ -506,14 +494,6 @@ button {
   color: var(--text-sub);
 }
 
-.guestbook__delete {
-  margin-left: auto;
-  font-size: 18px;
-  line-height: 1;
-  color: var(--text-sub);
-  padding: 0 2px;
-}
-
 .guestbook__message {
   margin-top: 8px;
   font-size: 14px;
@@ -548,25 +528,16 @@ button {
   margin: 40px 0 24px;
 }
 
-/* ---------- 9. 미니룸 ---------- */
+/* ---------- 1-1. 미니룸 ---------- */
 .miniroom {
   padding-top: 0;
+  padding-bottom: 0;
 }
 
 .miniroom__box {
   border: 1px solid #cfc6ba;
   background: #fff;
   font-family: Dotum, '돋움', Gulim, var(--sans);
-}
-
-.miniroom__bar {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 8px;
-  font-size: 11px;
-  letter-spacing: 0.02em;
-  color: #6b6b6b;
-  border-bottom: 1px solid #e5ded4;
 }
 
 .miniroom__stage {

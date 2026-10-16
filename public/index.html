@@ -8,6 +8,8 @@
     />
     <title>모바일 청첩장</title>
     <meta name="description" content="저희 결혼합니다." />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 
     <!-- 카카오톡/문자 공유 미리보기 (배포 후 실제 URL과 이미지로 변경) -->
     <meta property="og:type" content="website" />
@@ -50,6 +52,19 @@
         </div>
       </section>
 
+      <!-- 1-1. 미니룸 -->
+      <section class="section miniroom">
+        <div class="miniroom__box">
+          <div class="miniroom__stage" id="miniroom-stage">
+            <img
+              class="miniroom__room"
+              src="images/miniroom-garden.png"
+              alt=""
+            />
+          </div>
+        </div>
+      </section>
+
       <!-- 2. 인사말 -->
       <section class="section greeting">
         <p class="section__eyebrow">INVITATION</p>
@@ -69,11 +84,6 @@
             <strong data-bind="bride.name"></strong>
           </p>
         </div>
-        <div
-          class="photo photo--landscape"
-          data-img="greeting"
-          data-label="인사말 사진"
-        ></div>
       </section>
 
       <!-- 3. 예식 일시 / 달력 -->
@@ -101,22 +111,9 @@
           <span data-bind="venue.address"></span><br />
           <a class="location__tel" id="venue-tel" data-bind="venue.tel"></a>
         </p>
-        <div class="map" id="map"></div>
-        <div class="location__apps">
-          <a class="btn btn--app" id="link-naver" target="_blank" rel="noopener"
-            >네이버 지도</a
-          >
-          <a class="btn btn--app" id="link-kakao" target="_blank" rel="noopener"
-            >카카오맵</a
-          >
-          <a class="btn btn--app" id="link-tmap" target="_blank" rel="noopener"
-            >티맵</a
-          >
-        </div>
         <button class="btn btn--text" id="copy-address" type="button">
           주소 복사하기
         </button>
-        <!-- <dl class="location__transport" id="transport"></dl> -->
         <div class="location__guides">
           <a
             class="location__guide"
@@ -143,6 +140,15 @@
             ></div>
           </a> -->
         </div>
+        <div class="location__apps">
+          <a class="btn btn--app" id="link-naver" target="_blank" rel="noopener"
+            >네이버 지도</a
+          >
+          <a class="btn btn--app" id="link-kakao" target="_blank" rel="noopener"
+            >카카오맵</a
+          >
+        </div>
+        <!-- <dl class="location__transport" id="transport"></dl> -->
       </section>
 
       <!-- 6. 마음 전하실 곳 -->
@@ -169,7 +175,15 @@
         <h2 class="section__title">방명록</h2>
         <p class="section__desc">두 사람에게 축하의 마음을 남겨주세요.</p>
         <form class="guestbook__form" id="guestbook-form" novalidate>
-          <div class="guestbook__row">
+          <textarea
+            name="message"
+            rows="4"
+            placeholder="축하 메시지를 남겨주세요"
+            maxlength="500"
+            required
+          ></textarea>
+          <label class="guestbook__from">
+            <span>From.</span>
             <input
               name="name"
               type="text"
@@ -178,23 +192,7 @@
               autocomplete="name"
               required
             />
-            <input
-              name="password"
-              type="password"
-              placeholder="비밀번호 (삭제 시 필요)"
-              minlength="4"
-              maxlength="30"
-              autocomplete="new-password"
-              required
-            />
-          </div>
-          <textarea
-            name="message"
-            rows="4"
-            placeholder="축하 메시지를 남겨주세요"
-            maxlength="500"
-            required
-          ></textarea>
+          </label>
           <input
             class="guestbook__hp"
             name="website"
@@ -221,33 +219,10 @@
 
       <!-- 8. 마무리 -->
       <section class="ending">
-        <div
-          class="photo photo--ending"
-          data-img="ending"
-          data-label="마지막 사진"
-        ></div>
         <p class="ending__text">함께해 주셔서 감사합니다</p>
         <button class="btn btn--outline" id="share-link" type="button">
           청첩장 링크 복사하기
         </button>
-      </section>
-
-      <!-- 9. 미니룸 -->
-      <section class="section miniroom">
-        <p class="section__eyebrow">MINI ROOM</p>
-        <div class="miniroom__box">
-          <div class="miniroom__bar">
-            <span id="miniroom-no"></span>
-            <span id="miniroom-date"></span>
-          </div>
-          <div class="miniroom__stage" id="miniroom-stage">
-            <img
-              class="miniroom__room"
-              src="images/miniroom-garden.png"
-              alt=""
-            />
-          </div>
-        </div>
       </section>
 
       <footer class="footer">Thank you</footer>

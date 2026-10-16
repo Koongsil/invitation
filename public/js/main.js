@@ -148,23 +148,8 @@
   });
 
   // ---------- 오시는 길 ----------
-  (function renderMap() {
-    var q = encodeURIComponent(C.venue.mapQuery || C.venue.address);
-    var src = C.venue.googleMapsApiKey
-      ? 'https://www.google.com/maps/embed/v1/place?key=' + C.venue.googleMapsApiKey + '&q=' + q + '&language=ko&region=KR&zoom=16'
-      : 'https://maps.google.com/maps?q=' + q + '&hl=ko&z=16&output=embed';
-    var iframe = document.createElement('iframe');
-    iframe.src = src;
-    iframe.title = C.venue.name + ' 지도';
-    iframe.loading = 'lazy';
-    iframe.referrerPolicy = 'no-referrer-when-downgrade';
-    iframe.allowFullscreen = true;
-    $('#map').appendChild(iframe);
-  })();
-
   $('#link-naver').href = C.venue.naverMap;
   $('#link-kakao').href = C.venue.kakaoMap;
-  $('#link-tmap').href = C.venue.tmap;
   $$('[data-guide]').forEach(function (a) { a.href = C.images[a.dataset.guide]; });
   $('#copy-address').addEventListener('click', function () {
     copy(C.venue.address, '주소가 복사되었습니다.');
@@ -233,20 +218,8 @@
       li.className = 'guestbook__item';
       li.innerHTML =
         '<div class="guestbook__meta"><strong>' + escapeHtml(item.name) + '</strong>' +
-        '<span>' + formatDate(item.createdAt) + '</span>' +
-        '<button class="guestbook__delete" type="button" aria-label="삭제">&times;</button></div>' +
+        '<span>' + formatDate(item.createdAt) + '</span></div>' +
         '<p class="guestbook__message">' + escapeHtml(item.message) + '</p>';
-      $('.guestbook__delete', li).addEventListener('click', function () {
-        var pw = prompt('작성 시 입력한 비밀번호를 입력해 주세요.');
-        if (!pw) return;
-        request('DELETE', api + '/' + item.id, { password: pw })
-          .then(function () {
-            li.remove();
-            updateEmpty();
-            toast('삭제되었습니다.');
-          })
-          .catch(function (err) { toast(err.message); });
-      });
       return li;
     }
 
@@ -273,12 +246,10 @@
       e.preventDefault();
       var body = {
         name: form.name.value.trim(),
-        password: form.password.value,
         message: form.message.value.trim(),
         website: form.website.value,
       };
       if (!body.name) return toast('이름을 입력해 주세요.');
-      if (body.password.length < 4) return toast('비밀번호를 4자 이상 입력해 주세요.');
       if (!body.message) return toast('축하 메시지를 입력해 주세요.');
 
       var submit = $('button[type="submit"]', form);
@@ -445,10 +416,6 @@
         '" shape-rendering="crispEdges" aria-hidden="true">' + rects + '</svg>';
     }
 
-    $('#miniroom-no').textContent = 'NO.' + room.no;
-    $('#miniroom-date').textContent = 'DATE: ' + date.getFullYear() + '.' + pad2(date.getMonth() + 1) + '.' +
-      pad2(date.getDate()) + ' ' + pad2(date.getHours()) + ':' + pad2(date.getMinutes());
-
     var stage = $('#miniroom-stage');
     room.characters.forEach(function (ch, i) {
       var el = document.createElement('div');
@@ -462,8 +429,6 @@
         '<div class="miniroom__body">' + body + '</div>';
       stage.appendChild(el);
     });
-
-    function pad2(n) { return n < 10 ? '0' + n : String(n); }
   })();
 
   // ---------- 스크롤 등장 효과 ----------

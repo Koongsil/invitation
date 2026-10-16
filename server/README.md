@@ -43,9 +43,8 @@ npm run dev              # http://localhost:8787
 | 메서드 | 경로 | 본문 | 설명 |
 | --- | --- | --- | --- |
 | GET | `/api/guestbook?cursor=<id>` | | 최신순 10개씩, `nextCursor` 로 다음 페이지 |
-| POST | `/api/guestbook` | `{ name, password, message }` | 작성 |
-| DELETE | `/api/guestbook/:id` | `{ password }` | 작성 시 비밀번호로 삭제 |
+| POST | `/api/guestbook` | `{ name, message }` | 작성 |
 
-## 글 관리 (신랑·신부용)
+## 글 삭제 (관리자)
 
-Atlas 웹 콘솔 → **Browse Collections** → `invitation.guestbook` 에서 글을 보고 바로 삭제할 수 있습니다.
+방명록에는 삭제 기능이 없습니다. Atlas 웹 콘솔 → **Data Explorer (Browse Collections)** → `invitation.guestbook` 에서 글을 찾아 휴지통 아이콘으로 삭제합니다.

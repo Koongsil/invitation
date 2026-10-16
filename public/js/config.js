@@ -27,14 +27,8 @@ window.INVITATION = {
     hall: "1층 르노브홀",
     address: "서울특별시 강서구 공항대로36길 57",
     tel: "1661-3303",
-    // 구글 지도: Maps Embed API 키 (비워두면 키 없는 기본 임베드로 표시)
-    // 공개 저장소에 올라가므로 Google Cloud 콘솔에서 반드시 HTTP 리퍼러 제한을 걸어주세요
-    googleMapsApiKey: "",
-    // 지도에서 검색할 값 (비워두면 address 사용)
-    mapQuery: "",
     naverMap: "https://map.naver.com/",
     kakaoMap: "https://map.kakao.com/",
-    tmap: "https://tmap.life/",
     transport: [{ title: "주차", desc: "웨딩홀 지하 주차장 2시간 무료" }],
   },
 
@@ -53,10 +47,9 @@ window.INVITATION = {
   images: {
     main: "images/main.jpg", // 메인 커버 (세로 3:4 권장)
     greeting: "images/greeting.jpg", // 인사말 아래 사진 (가로 4:3 권장)
-    // 오시는 길 하단 이미지 (누르면 크게 보기)
+    // 오시는 길 약도 이미지 (누르면 크게 보기)
     locationMap: "images/map.jpg", // 약도
     locationDirection: "images/direction.jpg", // 교통 안내
-    ending: "images/ending.jpg", // 마지막 사진
     // 갤러리 (개수 자유롭게 추가/삭제)
     gallery: [
       "images/gallery/01.jpg",
@@ -76,7 +69,6 @@ window.INVITATION = {
 
   // 싸이월드 미니룸 (페이지 맨 아래)
   miniroom: {
-    no: 24, // 왼쪽 위 게시물 번호
     characters: [
       {
         sprite: "groom", // 기본 도트 캐릭터 (groom / bride)
