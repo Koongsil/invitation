@@ -73,7 +73,7 @@ window.INVITATION = {
 
   // 방명록 API 주소 (server/ 의 Cloudflare Worker 배포 주소, 비워두면 방명록 숨김)
   // 예: "https://invitation-guestbook.<계정>.workers.dev"
-  guestbookApi: "",
+  guestbookApi: "https://invitation-server-two.vercel.app",
 
   accounts: {
     groom: [
