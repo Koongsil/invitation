@@ -1,0 +1,239 @@
+<!doctype html>
+<!-- 미니룸 도트 배경 생성기 (192x132 캔버스). 수정 후 아래 명령으로 PNG 다시 만들기:
+     chrome --headless=new --force-device-scale-factor=1 --window-size=192,132 --screenshot=public/images/miniroom-garden.png tools/miniroom-garden.html -->
+<html><body style="margin:0;background:#000"><canvas id="c" width="192" height="132" style="display:block"></canvas><script>(function () {
+var W = 192, H = 132, CX = 96, CY = 46;
+var ctx = document.getElementById('c').getContext('2d');
+function px(x, y, c) { if (x < 0 || y < 0 || x >= W || y >= H) return; ctx.fillStyle = c; ctx.fillRect(x, y, 1, 1); }
+function rect(x, y, w, h, c) { for (var j = 0; j < h; j++) for (var i = 0; i < w; i++) px(x + i, y + j, c); }
+function hash(x, y) { var n = (x * 374761393 + y * 668265263) ^ 0x5bd1e995; n = (n ^ (n >>> 13)) * 1274126177; return ((n ^ (n >>> 16)) >>> 0) / 4294967296; }
+// 벽과 바닥 경계 (2:1 계단)
+function seam(x) { return x <= CX ? CY + Math.floor((CX - x) / 2) : CY + Math.floor((x - CX) / 2); }
+
+// ---------- 벽 ----------
+for (var x = 0; x < W; x++) {
+  var left = x < CX;
+  for (var y = 0; y < seam(x); y++) {
+    var c = left ? '#efe6d4' : '#f8f2e6';
+    if (x % 12 === 0) c = left ? '#e2d6be' : '#ebe2cf';
+    if (x === CX) c = '#d6c8ab';
+    px(x, y, c);
+  }
+}
+
+// ---------- 아치형 창문 (벽 기울기에 맞춰 열마다 위아래를 계단으로) ----------
+function windowAt(x0, side) {
+  var w = 22, archPad = [5, 3, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 3, 5];
+  for (var i = 0; i < w; i++) {
+    var x = x0 + i;
+    var base = seam(x) - 20; // 창 아래
+    var top = base - 30 + archPad[i];
+    for (var y = top; y < base; y++) {
+      var d = y - top, fromBottom = base - y, c;
+      if (i === 0 || i === w - 1 || d === 0 || fromBottom === 1) c = '#ffffff';
+      else if (i === 11 || y === top + Math.floor((base - top) / 2)) c = '#ffffff';
+      else if (fromBottom <= 6) c = (hash(x, y) > 0.5 ? '#79a95c' : '#5f8f4b');
+      else if (fromBottom <= 8 && hash(x, 3) > 0.45) c = '#8fbf6c';
+      else c = d < 8 ? '#a8daf1' : d < 16 ? '#c4e8f7' : '#e1f4fb';
+      px(x, y, c);
+    }
+    px(x, base, '#d4c6aa'); // 창 아래 그림자
+  }
+}
+windowAt(26, 'L');
+windowAt(144, 'R');
+
+// ---------- 꼬마전구 줄 ----------
+function lights(x0, x1, y0, y1, sag) {
+  for (var x = x0; x <= x1; x++) {
+    var t = (x - x0) / (x1 - x0);
+    var y = Math.round(y0 + (y1 - y0) * t + sag * 4 * t * (1 - t));
+    px(x, y, '#9a8a6a');
+    if ((x - x0) % 9 === 4) {
+      px(x, y + 1, '#ffd75e'); px(x, y + 2, '#ffd75e'); px(x + 1, y + 1, '#ffe891'); px(x + 1, y + 2, '#ffd75e');
+      px(x - 1, y + 2, '#fff3c4'); px(x + 2, y + 2, '#fff3c4'); px(x, y + 3, '#fff3c4'); px(x + 1, y + 3, '#fff3c4');
+    }
+  }
+}
+lights(0, CX, 9, 3, 10);
+lights(CX, W - 1, 3, 9, 10);
+
+// ---------- 생울타리 ----------
+var bump = [3, 2, 1, 0, 0, 1, 2, 3, 3];
+for (var x = 0; x < W; x++) {
+  var s = seam(x), top = s - 15 + bump[x % 9];
+  for (var y = top; y < s; y++) {
+    var d = y - top, c;
+    if (d === 0) c = '#3f6b35';
+    else if (d <= 2) c = '#8dbd69';
+    else if (d <= 6) c = '#6c9d55';
+    else c = '#55853f';
+    if (x < CX) c = c === '#55853f' ? '#4c7a38' : c; // 왼쪽 벽 쪽은 조금 어둡게
+    if (d > 1 && d < 12 && hash(x >> 1, y >> 1) > 0.86 && x % 2 === 0 && y % 2 === 0) {
+      var fc = ['#f59ab0', '#ffffff', '#f7c48f'][Math.floor(hash(x, y) * 3)];
+      px(x, y, fc); px(x + 1, y, fc); px(x, y + 1, fc); px(x + 1, y + 1, fc);
+
+      continue;
+    }
+    px(x, y, c);
+  }
+}
+
+// ---------- 바닥: 대리석 타일 (2:1 줄눈) ----------
+for (var x = 0; x < W; x++) {
+  for (var y = seam(x); y < H; y++) {
+    var u = ((x + 2 * y) % 24 + 24) % 24, v = ((2 * y - x) % 24 + 24) % 24;
+    var c = (u < 2 || v < 2) ? '#e0d3bd' : ((Math.floor((x + 2 * y) / 24) + Math.floor((2 * y - x) / 24)) % 2 ? '#f4ede1' : '#f8f3ea');
+    px(x, y, c);
+  }
+  px(x, seam(x), '#c4b18c');
+  px(x, seam(x) + 1, '#dccbab');
+}
+
+// ---------- 꽃 아치 ----------
+var AX = CX, AY = 30, R = 16;
+function archCell(x, y) {
+  if (y > AY) return Math.abs(Math.abs(x - AX + 0.5) - R) < 2.5 && y <= 62;
+  var d = Math.hypot(x - AX + 0.5, y - AY);
+  return d > R - 2.5 && d < R + 2.5;
+}
+for (var y = AY - R - 4; y <= 62; y++) for (var x = AX - R - 4; x <= AX + R + 4; x++) {
+  if (!archCell(x, y)) continue;
+  var outline = !archCell(x - 1, y) || !archCell(x + 1, y) || !archCell(x, y - 1) || !archCell(x, y + 1);
+  px(x, y, outline ? '#3f6b35' : (x < AX ? '#6c9d55' : '#5a8a48'));
+}
+var ap = [];
+for (var i = 0; i < 4; i++) ap.push([AX - R - 1, 60 - i * 8], [AX + R - 1, 58 - i * 8]);
+for (var a = 20; a < 180; a += 26) ap.push([Math.round(AX - 1 - R * Math.cos(a * Math.PI / 180)), Math.round(AY - 1 - R * Math.sin(a * Math.PI / 180))]);
+ap.forEach(function (p, i) {
+  var c = ['#f59ab0', '#ffffff', '#f7c48f'][i % 3];
+  rect(p[0], p[1], 2, 2, c); px(p[0] + 1, p[1], i % 3 === 1 ? '#f0e8f4' : '#ffd0dc');
+});
+// 꼭대기 큰 꽃
+rect(AX - 3, AY - R - 4, 6, 6, '#e8607f'); rect(AX - 2, AY - R - 5, 4, 8, '#e8607f'); rect(AX - 4, AY - R - 3, 8, 4, '#e8607f');
+rect(AX - 1, AY - R - 2, 2, 2, '#ffd34d');
+
+// ---------- 꽃 화분 ----------
+function pot(cx, by) {
+  for (var j = 0; j < 8; j++) {
+    var hw = 6 - Math.floor(j / 3);
+    for (var i = -hw; i < hw; i++) px(cx + i, by - 8 + j, i === -hw || i === hw - 1 || j === 7 ? '#7a5230' : (i < 0 ? '#c99460' : '#b07e4c'));
+  }
+  rect(cx - 7, by - 10, 14, 2, '#8f6238');
+  // 덤불
+  for (var y = by - 26; y < by - 9; y++) for (var x = cx - 10; x < cx + 10; x++) {
+    var d = Math.hypot((x - cx + 0.5) / 1.0, (y - (by - 18)) / 0.95);
+    if (d < 9.5) {
+      var edge = d > 8.6;
+      px(x, y, edge ? '#3f6b35' : (x - cx < -2 && y < by - 18 ? '#8dbd69' : d < 6 ? '#6c9d55' : '#55853f'));
+    }
+  }
+  [[-5, -21, '#ffffff'], [2, -24, '#f59ab0'], [4, -17, '#f7c48f'], [-3, -14, '#f59ab0'], [-7, -17, '#f59ab0'], [0, -19, '#ffffff'], [6, -21, '#ffffff']].forEach(function (f) {
+    rect(cx + f[0], by + f[1], 2, 2, f[2]);
+  });
+}
+pot(17, 128);
+pot(175, 128);
+
+// ---------- 소품 공통: inside(x, y) 영역을 color(x, y) 로 칠하고 둘레에 외곽선 ----------
+function shape(x0, y0, x1, y1, inside, color, outline) {
+  for (var y = y0 - 1; y <= y1 + 1; y++) for (var x = x0 - 1; x <= x1 + 1; x++) {
+    if (inside(x, y)) px(x, y, color(x, y));
+    else if (outline && (inside(x - 1, y) || inside(x + 1, y) || inside(x, y - 1) || inside(x, y + 1))) px(x, y, outline);
+  }
+}
+// 글자 그림: rows 의 글자를 palette 색으로, '.' 은 투명. 외곽선 자동
+function sprite(x0, y0, rows, palette, outline) {
+  var at = function (x, y) { var r = rows[y - y0]; return r && palette[r[x - x0]]; };
+  shape(x0, y0, x0 + rows[0].length - 1, y0 + rows.length - 1, function (x, y) { return !!at(x, y); }, at, outline);
+}
+
+// ---------- 하트 풍선 (벽 위쪽) ----------
+function balloon(x0, y0, c, shade, knotX, knotY) {
+  sprite(x0, y0, ['.AA.AA.', 'AhAAAAB', 'AAAAAAB', '.AAAAB.', '..AAB..', '...B...'], { A: c, B: shade, h: '#ffffff' }, '#8a5a5a');
+  var sx = x0 + 3, sy = y0 + 7;
+  for (var y = sy; y < knotY; y++) px(Math.round(sx + (knotX - sx) * (y - sy) / (knotY - sy)), y, '#b8a890');
+}
+balloon(3, 20, '#f59ab0', '#d9738c', 13, 44);
+balloon(11, 15, '#ffffff', '#ddd5e6', 13, 44);
+balloon(18, 22, '#f7c48f', '#d9a06a', 13, 44);
+balloon(167, 22, '#f7c48f', '#d9a06a', 178, 44);
+balloon(174, 15, '#f59ab0', '#d9738c', 178, 44);
+balloon(182, 20, '#ffffff', '#ddd5e6', 178, 44);
+rect(12, 44, 2, 2, '#e8607f');
+rect(177, 44, 2, 2, '#e8607f');
+
+// ---------- 나비 ----------
+sprite(58, 34, ['P.P', 'PbP', '.b.'], { P: '#f59ab0', b: '#5a3d22' });
+sprite(136, 30, ['Y.Y', 'YbY', '.b.'], { Y: '#ffd34d', b: '#5a3d22' });
+sprite(170, 60, ['P.P', 'PbP', '.b.'], { P: '#c9b6f2', b: '#5a3d22' });
+
+// ---------- 아치 위 비둘기 ----------
+sprite(83, 8, ['.WW..', 'WWWWo', '..WW.'], { W: '#ffffff', o: '#f7a35c' }, '#9a9aa8');
+sprite(105, 8, ['..WW.', 'oWWWW', '.WW..'], { W: '#ffffff', o: '#f7a35c' }, '#9a9aa8');
+
+// ---------- 촛불 랜턴 (아치 양옆) ----------
+function lantern(x0, y0) {
+  sprite(x0, y0, ['.ddd.', 'ddddd', 'dGGGd', 'dGfGd', 'dGFGd', 'dGGGd', 'ddddd'], { d: '#4a4a52', G: '#fff3c4', f: '#ffd75e', F: '#ff9d3d' }, '#2e2e34');
+  px(x0 + 2, y0 - 2, '#4a4a52'); // 손잡이
+}
+lantern(70, 59);
+lantern(117, 59);
+
+// ---------- 웨딩 케이크 + 테이블 (가운데 앞) ----------
+function cake(cx, by) {
+  // 테이블보
+  shape(cx - 13, by - 16, cx + 12, by,
+    function (x, y) {
+      if (x < cx - 13 || x > cx + 12 || y > by) return false;
+      if (y >= by - 14) return true;
+      var dx = (x - cx + 0.5) / 13, dy = (y - (by - 14)) / 2.5;
+      return dx * dx + dy * dy <= 1;
+    },
+    function (x, y) {
+      if (y === by || (y === by - 1 && (x - cx) % 4 === 0)) return '#f2a7ba';
+      if (y < by - 13) return '#ffffff';
+      return x > cx + 6 ? '#e6ddcf' : x > cx + 2 ? '#f1ebe1' : '#fbf8f3';
+    }, '#b7a68e');
+  // 3단 케이크
+  [[8, 7, 16], [6, 6, 23], [4, 5, 29]].forEach(function (t) {
+    var hw = t[0], h = t[1], top = by - t[2] - h + 1;
+    shape(cx - hw, top, cx + hw - 1, top + h - 1,
+      function (x, y) { return x >= cx - hw && x <= cx + hw - 1 && y >= top && y <= top + h - 1; },
+      function (x, y) {
+        if (y === top) return '#ffffff';
+        if (y === top + Math.floor(h / 2) && (x - cx) % 3 === 0) return '#f59ab0';
+        return x >= cx + hw - 3 ? '#ebe1d1' : '#fffdf8';
+      }, '#b7a68e');
+  });
+  // 꼭대기 하트
+  sprite(cx - 3, by - 40, ['RR.RR', 'RRRRR', '.RRR.', '..R..'], { R: '#e8607f' }, '#8a3a4a');
+}
+cake(96, 126);
+
+// ---------- 선물 상자 (왼쪽 앞) ----------
+shape(30, 118, 39, 127, function (x, y) { return x >= 30 && x <= 39 && y >= 118 && y <= 127; },
+  function (x, y) { return x === 34 || x === 35 || y === 121 ? '#ffffff' : x >= 37 ? '#e3869d' : '#f6a9bb'; }, '#8a4a5a');
+shape(32, 111, 38, 116, function (x, y) { return x >= 32 && x <= 38 && y >= 111 && y <= 116; },
+  function (x, y) { return x === 35 || y === 113 ? '#ffd34d' : x >= 37 ? '#8ccbb8' : '#a8e0cf'; }, '#3f7a6a');
+sprite(33, 108, ['Y.Y', '.Y.'], { Y: '#ffd34d' }, '#a07a2a');
+
+// ---------- 웰컴 보드 이젤 (오른쪽) ----------
+for (var y = 84; y <= 104; y++) { px(149 + Math.floor((104 - y) / 8), y, '#8f6238'); px(161 - Math.floor((104 - y) / 8), y, '#8f6238'); }
+for (var y = 84; y <= 100; y++) px(155, y, '#6e4a2a');
+shape(146, 74, 164, 90, function (x, y) { return x >= 146 && x <= 164 && y >= 74 && y <= 90; },
+  function (x, y) {
+    if (x === 146 || x === 164 || y === 74 || y === 90) return '#b98048';
+    return '#fffdf8';
+  }, '#6e4a2a');
+sprite(152, 77, ['RR.RR', 'RRRRR', '.RRR.', '..R..'], { R: '#f59ab0' });
+for (var x = 150; x <= 160; x++) { if (x % 2 === 0) px(x, 83, '#a8988a'); }
+for (var x = 151; x <= 159; x++) px(x, 85, '#c9b9a5');
+for (var x = 152; x <= 158; x++) px(x, 87, '#c9b9a5');
+
+// ---------- 바닥 꽃잎 ----------
+[[48, 106], [78, 94], [114, 90], [148, 114], [62, 129], [140, 128], [120, 104], [44, 92]].forEach(function (p, i) {
+  var c = i % 2 ? '#f59ab0' : '#ffffff';
+  px(p[0], p[1], c); px(p[0] + 1, p[1], c);
+});
+})();</script></body></html>

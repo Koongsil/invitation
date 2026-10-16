@@ -165,12 +165,16 @@
   $('#link-naver').href = C.venue.naverMap;
   $('#link-kakao').href = C.venue.kakaoMap;
   $('#link-tmap').href = C.venue.tmap;
+  $$('[data-guide]').forEach(function (a) { a.href = C.images[a.dataset.guide]; });
   $('#copy-address').addEventListener('click', function () {
     copy(C.venue.address, '주소가 복사되었습니다.');
   });
-  $('#transport').innerHTML = C.venue.transport
-    .map(function (t) { return '<dt>' + escapeHtml(t.title) + '</dt><dd>' + escapeHtml(t.desc) + '</dd>'; })
-    .join('');
+  var transport = $('#transport');
+  if (transport) {
+    transport.innerHTML = C.venue.transport
+      .map(function (t) { return '<dt>' + escapeHtml(t.title) + '</dt><dd>' + escapeHtml(t.desc) + '</dd>'; })
+      .join('');
+  }
 
   // ---------- 계좌 ----------
   $$('.accordion').forEach(function (acc) {
@@ -335,6 +339,132 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
+
+  // ---------- 미니룸 ----------
+  (function renderMiniroom() {
+    var room = C.miniroom;
+    if (!room) return;
+
+    // 싸이월드 미니미 도트 (글자 하나 = 1픽셀, '.' 은 투명). 외곽선은 그릴 때 자동으로 둘러진다
+    var SPRITE_OUTLINE = '#3a2418';
+    // 빛은 왼쪽 위에서: 소문자/별도 글자로 하이라이트·그림자 톤을 둔다
+    var BASE = {
+      H: '#6b3a1f', h: '#a2643a', D: '#45220f', // 머리 (기본 / 하이라이트 / 그림자)
+      S: '#ffdcb8', s: '#efbc93', // 피부 (기본 / 그림자)
+      P: '#f6a3a3', E: '#2a1a10', M: '#c0504a', // 볼터치 / 눈 / 입
+    };
+    var SPRITES = {
+      groom: {
+        palette: Object.assign({}, BASE, {
+          J: '#2c2e3b', j: '#4a4e63', K: '#17181f', // 턱시도 (기본 / 하이라이트 / 그림자)
+          W: '#ffffff', w: '#d9dee8', // 셔츠
+          R: '#d23434', r: '#8e1f1f', // 나비넥타이
+          F: '#f27a96', // 부토니에르
+          L: '#24252f', l: '#121219', // 바지
+          B: '#151515', b: '#6a6a6a', // 구두 (기본 / 광택)
+        }),
+        rows: [
+          '...HHHHHHH...',
+          '..HhhhHHHHH..',
+          '.HhhHHHHHHHD.',
+          '.HhHHHHHHHDD.',
+          '.HHHHHHHHHDD.',
+          '.HHSSSSSSSHD.',
+          '.HSSESSSESsD.',
+          '.HSSESSSESsH.',
+          '.SPSSSSSSSPs.',
+          '..SSSSMSSSs..',
+          '...sSSSSSs...',
+          '.....sss.....',
+          '...JWRrRWJ...',
+          '..JjJWwWJJK..',
+          '.JjjJWwWJFKK.',
+          '.JjJJJwJJJKK.',
+          '.JjJJJJJJJKK.',
+          '.SjJJJJJJJKs.',
+          '..KJJJJJJJK..',
+          '...LLLLLLl...',
+          '...LLLLLLl...',
+          '...LLl.LLl...',
+          '...LLl.LLl...',
+          '...LLl.LLl...',
+          '..BbBB.BbBB..',
+        ],
+      },
+      bride: {
+        palette: Object.assign({}, BASE, {
+          V: '#f7f5fc', v: '#d6d0e8', // 면사포 (기본 / 그림자)
+          T: '#ffd34d', // 티아라
+          G: '#fffdf8', g: '#eadfcd', d: '#cfbfa6', // 드레스 (기본 / 그림자 / 짙은 그림자)
+          F: '#f27a96', f: '#ffb6c6', n: '#5f9e45', // 부케 꽃 / 꽃 하이라이트 / 잎
+        }),
+        rows: [
+          '.....TFTFT.....',
+          '....HHHHHHH....',
+          '...HhhhHHHHH...',
+          '..VHhhHHHHHDV..',
+          '.VVHhHHHHHHDVv.',
+          '.VHHHHHHHHHHDv.',
+          '.VHHSSSSSSSHDv.',
+          '.VHSSESSSESsHv.',
+          '.VHSSESSSESsHv.',
+          '.VHSPSSSSSPsHv.',
+          'VVHHSSSMSSsHHvv',
+          'VvHHDsSSSsDHHvv',
+          'Vv.HD.sss.DH.vv',
+          'Vv..sGGGGGs..vv',
+          'Vv.SGGGGGGgS.vv',
+          'Vv.SSFFFFFSS.vv',
+          'Vv..GFfFFFg..vv',
+          'Vv..GnFFFng..vv',
+          'Vv..GGGnGGg..vv',
+          'V..gGGGGGGGg..v',
+          '..gGGGGGGGGgd..',
+          '..gGGGGGGGGgd..',
+          '.gGGGGGGGGGGgd.',
+          'gGGGGGGGGGGGgdd',
+          'ggggggggggggddd',
+        ],
+      },
+    };
+
+    function spriteSvg(sp) {
+      var w = sp.rows[0].length;
+      var h = sp.rows.length;
+      var filled = function (x, y) { return y >= 0 && y < h && x >= 0 && x < w && !!sp.palette[sp.rows[y][x]]; };
+      var rects = '';
+      for (var y = -1; y <= h; y++) {
+        for (var x = -1; x <= w; x++) {
+          var fill = filled(x, y) ? sp.palette[sp.rows[y][x]]
+            : filled(x - 1, y) || filled(x + 1, y) || filled(x, y - 1) || filled(x, y + 1) ? SPRITE_OUTLINE : null;
+          if (fill) rects += '<rect x="' + (x + 1) + '" y="' + (y + 1) + '" width="1" height="1" fill="' + fill + '"/>';
+        }
+      }
+      var px = 3; // 도트 1칸 = 3px
+      return '<svg viewBox="0 0 ' + (w + 2) + ' ' + (h + 2) + '" width="' + (w + 2) * px + '" height="' + (h + 2) * px +
+        '" shape-rendering="crispEdges" aria-hidden="true">' + rects + '</svg>';
+    }
+
+    $('#miniroom-no').textContent = 'NO.' + room.no;
+    $('#miniroom-date').textContent = 'DATE: ' + date.getFullYear() + '.' + pad2(date.getMonth() + 1) + '.' +
+      pad2(date.getDate()) + ' ' + pad2(date.getHours()) + ':' + pad2(date.getMinutes());
+
+    var stage = $('#miniroom-stage');
+    room.characters.forEach(function (ch, i) {
+      var el = document.createElement('div');
+      el.className = 'miniroom__char';
+      el.style.left = ch.x + '%';
+      el.style.animationDelay = i * 0.4 + 's';
+      var body = ch.image
+        ? '<img src="' + escapeHtml(ch.image) + '" alt="" />'
+        : spriteSvg(SPRITES[ch.sprite] || SPRITES.groom);
+      el.innerHTML = (ch.bubble ? '<p class="miniroom__bubble">' + escapeHtml(ch.bubble) + '</p>' : '') +
+        '<div class="miniroom__body">' + body + '</div>';
+      stage.appendChild(el);
+    });
+
+    function pad2(n) { return n < 10 ? '0' + n : String(n); }
+  })();
 
   // ---------- 스크롤 등장 효과 ----------
   if ('IntersectionObserver' in window) {
