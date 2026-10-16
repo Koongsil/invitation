@@ -517,6 +517,10 @@ button {
   margin-top: 16px;
 }
 
+.guestbook__more[hidden] {
+  display: none;
+}
+
 /* ---------- 8. 마무리 ---------- */
 .ending {
   text-align: center;

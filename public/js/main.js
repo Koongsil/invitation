@@ -263,7 +263,7 @@
         .then(function () { moreBtn.disabled = false; });
     }
 
-    moreBtn.addEventListener('click', load);
+    moreBtn.addEventListener('click', function () { if (cursor) load(); });
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
