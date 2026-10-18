@@ -432,7 +432,7 @@
       var line = c.lines[c.line++ % c.lines.length];
       c.bubble.innerHTML = (line.name ? '<b>' + escapeHtml(line.name) + '</b>' : '') + escapeHtml(line.text);
       c.state = 'talk';
-      c.until = now + Math.min(7000, 3500 + line.text.length * 80);
+      c.until = now + Math.min(6000, 3000 + line.text.length * 70);
       c.lastTalk = now;
       place(c);
       c.el.classList.add('is-talking');
@@ -467,20 +467,11 @@
     function tick() {
       if (!visible || document.hidden) return;
       var now = Date.now();
-      var talking = chars.filter(function (c) { return c.state === 'talk'; }).length;
       chars.forEach(function (c) {
         if (now < c.until) return;
-        if (c.state === 'talk') {
-          c.el.classList.remove('is-talking');
-          talking--;
-        } else if (c.state === 'walk') {
-          c.el.classList.remove('is-walking');
-        }
-        var wantsTalk = talking < MAX_TALKING && now - c.lastTalk > 8000 && Math.random() < 0.35 && !crowded(c);
-        if (c.state !== 'talk' && wantsTalk) {
-          talk(c, now);
-          talking++;
-        } else if (c.state !== 'idle' || still) {
+        if (c.state === 'talk') c.el.classList.remove('is-talking');
+        if (c.state === 'walk') c.el.classList.remove('is-walking');
+        if (c.state !== 'idle' || still) {
           c.state = 'idle';
           c.until = now + 1200 + Math.random() * 2800;
           place(c);
@@ -488,6 +479,17 @@
           walk(c, now);
         }
       });
+      // 늘 2명이 말하도록, 서 있는 사람 중 가장 오래 말 안 한 사람부터 (말풍선이 겹치는 자리면 다음 사람)
+      var talking = chars.filter(function (c) { return c.state === 'talk'; }).length;
+      if (talking >= MAX_TALKING) return;
+      chars
+        .filter(function (c) { return c.state === 'idle' && now - c.lastTalk > 1500; })
+        .sort(function (a, b) { return a.lastTalk - b.lastTalk; })
+        .some(function (c) {
+          if (crowded(c)) return false;
+          talk(c, now);
+          return ++talking >= MAX_TALKING;
+        });
     }
 
     function guestLine(item) {
