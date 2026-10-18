@@ -492,9 +492,10 @@
         });
     }
 
+    // 말풍선에 다 들어가는 길이. 작성 폼 textarea 의 maxlength 도 같은 값 (index.html)
     function guestLine(item) {
       var text = String(item.message).replace(/\s+/g, ' ').trim();
-      return { name: item.name, text: text.length > 36 ? text.slice(0, 35) + '…' : text };
+      return { name: item.name, text: text.length > 35 ? text.slice(0, 34) + '…' : text };
     }
 
     function addGuest(item) {
