@@ -551,61 +551,6 @@ button {
   cursor: default;
 }
 
-.guestbook__list {
-  list-style: none;
-  margin-top: 28px;
-  text-align: left;
-}
-
-.guestbook__item {
-  padding: 16px;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-
-.guestbook__item + .guestbook__item {
-  margin-top: 8px;
-}
-
-.guestbook__meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-}
-
-.guestbook__meta strong {
-  font-weight: 500;
-}
-
-.guestbook__meta span {
-  font-size: 12px;
-  color: var(--text-sub);
-}
-
-.guestbook__message {
-  margin-top: 8px;
-  font-size: 14px;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.guestbook__empty {
-  margin-top: 28px;
-  font-size: 13px;
-  color: var(--text-sub);
-}
-
-.guestbook__more {
-  width: 100%;
-  margin-top: 16px;
-}
-
-.guestbook__more[hidden] {
-  display: none;
-}
-
 /* ---------- 8. 마무리 ---------- */
 .ending {
   text-align: center;

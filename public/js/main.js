@@ -405,7 +405,7 @@
     }
 
     function create(opts) {
-      var c = { lines: opts.lines, state: 'idle', until: Date.now() + Math.random() * 2500, lastTalk: 0, line: 0, host: !!opts.host };
+      var c = { lines: opts.lines, state: 'idle', until: Date.now() + Math.random() * 2500, lastTalk: 0, line: 0 };
       c.el = document.createElement('div');
       c.el.className = 'plaza__char';
       c.el.innerHTML = '<p class="plaza__bubble"></p><div class="plaza__body">' + spriteSvg(opts.sprite, 2) + '</div>';
@@ -476,7 +476,7 @@
         } else if (c.state === 'walk') {
           c.el.classList.remove('is-walking');
         }
-        var wantsTalk = talking < MAX_TALKING && now - c.lastTalk > (c.host ? 15000 : 8000) && Math.random() < 0.35 && !crowded(c);
+        var wantsTalk = talking < MAX_TALKING && now - c.lastTalk > 8000 && Math.random() < 0.35 && !crowded(c);
         if (c.state !== 'talk' && wantsTalk) {
           talk(c, now);
           talking++;
@@ -490,11 +490,6 @@
       });
     }
 
-    var hosts = [
-      create({ sprite: SPRITES.groom, host: true, lines: [{ text: '방명록 남겨주세요!' }] }),
-      create({ sprite: SPRITES.bride, host: true, lines: [{ text: '여기서 같이 놀아요♥' }] }),
-    ];
-
     function guestLine(item) {
       var text = String(item.message).replace(/\s+/g, ' ').trim();
       return { name: item.name, text: text.length > 36 ? text.slice(0, 35) + '…' : text };
@@ -502,18 +497,8 @@
 
     function addGuest(item) {
       var c = create({ sprite: guestSprite(String(item.id || item.name)), lines: [guestLine(item)] });
-      var guests = chars.filter(function (g) { return !g.host; });
-      if (guests.length > MAX_GUESTS) {
-        var old = guests[0];
-        old.el.remove();
-        chars.splice(chars.indexOf(old), 1);
-      }
+      if (chars.length > MAX_GUESTS) chars.shift().el.remove();
       return c;
-    }
-
-    function setHostLines(hasGuests) {
-      hosts[0].lines = [{ text: hasGuests ? '와주셔서 고마워요!' : '방명록 남겨주세요!' }];
-      hosts[1].lines = [{ text: hasGuests ? '축하 메시지 다 읽고 있어요♥' : '여기서 같이 놀아요♥' }];
     }
 
     if ('IntersectionObserver' in window) {
@@ -527,12 +512,10 @@
       // 처음 불러온 방명록(최신순)으로 손님을 채운다
       set: function (items) {
         items.slice(0, MAX_GUESTS).reverse().forEach(addGuest);
-        setHostLines(items.length > 0);
       },
       // 방금 쓴 글은 바로 말하게
       add: function (item) {
         talk(addGuest(item), Date.now());
-        setHostLines(true);
       },
     };
   })();
@@ -542,9 +525,6 @@
     if (!C.guestbookApi) return;
     var api = C.guestbookApi.replace(/\/+$/, '') + '/api/guestbook';
     var form = $('#guestbook-form');
-    var listEl = $('#guestbook-list');
-    var moreBtn = $('#guestbook-more');
-    var cursor = null;
 
     $('#guestbook').hidden = false;
 
@@ -561,43 +541,12 @@
       });
     }
 
-    function formatDate(iso) {
-      var d = new Date(iso);
-      return d.getFullYear() + '.' + pad(d.getMonth() + 1) + '.' + pad(d.getDate());
-    }
-
-    function pad(n) { return n < 10 ? '0' + n : String(n); }
-
-    function renderItem(item) {
-      var li = document.createElement('li');
-      li.className = 'guestbook__item';
-      li.innerHTML =
-        '<div class="guestbook__meta"><strong>' + escapeHtml(item.name) + '</strong>' +
-        '<span>' + formatDate(item.createdAt) + '</span></div>' +
-        '<p class="guestbook__message">' + escapeHtml(item.message) + '</p>';
-      return li;
-    }
-
-    function updateEmpty() {
-      $('#guestbook-empty').hidden = listEl.children.length > 0;
-    }
-
+    // 목록은 따로 그리지 않고, 최신 글들을 방명록 미니룸의 손님으로만 보여준다
     function load() {
-      var first = !cursor;
-      moreBtn.disabled = true;
-      request('GET', api + (cursor ? '?cursor=' + cursor : ''))
-        .then(function (data) {
-          data.items.forEach(function (item) { listEl.appendChild(renderItem(item)); });
-          if (first) plaza.set(data.items);
-          cursor = data.nextCursor;
-          moreBtn.hidden = !cursor;
-          updateEmpty();
-        })
-        .catch(function (err) { toast(err.message); })
-        .then(function () { moreBtn.disabled = false; });
+      request('GET', api)
+        .then(function (data) { plaza.set(data.items); })
+        .catch(function (err) { toast(err.message); });
     }
-
-    moreBtn.addEventListener('click', function () { if (cursor) load(); });
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -613,10 +562,8 @@
       submit.disabled = true;
       request('POST', api, body)
         .then(function (data) {
-          listEl.insertBefore(renderItem(data.item), listEl.firstChild);
           plaza.add(data.item);
           form.reset();
-          updateEmpty();
           toast('방명록이 등록되었습니다.');
         })
         .catch(function (err) { toast(err.message); })
