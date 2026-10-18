@@ -199,6 +199,344 @@
     });
   });
 
+  // ---------- 미니미 도트 (미니룸 · 방명록 미니룸 공용) ----------
+  // 싸이월드 미니미 도트 (글자 하나 = 1픽셀, '.' 은 투명). 외곽선은 그릴 때 자동으로 둘러진다
+  var SPRITE_OUTLINE = '#3a2418';
+  // 빛은 왼쪽 위에서: 소문자/별도 글자로 하이라이트·그림자 톤을 둔다
+  var BASE = {
+    H: '#6b3a1f', h: '#a2643a', D: '#45220f', // 머리 (기본 / 하이라이트 / 그림자)
+    S: '#ffdcb8', s: '#efbc93', // 피부 (기본 / 그림자)
+    P: '#f6a3a3', E: '#2a1a10', M: '#c0504a', // 볼터치 / 눈 / 입
+  };
+  var SPRITES = {
+    groom: {
+      palette: Object.assign({}, BASE, {
+        J: '#2c2e3b', j: '#4a4e63', K: '#17181f', // 턱시도 (기본 / 하이라이트 / 그림자)
+        W: '#ffffff', w: '#d9dee8', // 셔츠
+        R: '#d23434', r: '#8e1f1f', // 나비넥타이
+        F: '#f27a96', // 부토니에르
+        L: '#24252f', l: '#121219', // 바지
+        B: '#151515', b: '#6a6a6a', // 구두 (기본 / 광택)
+      }),
+      rows: [
+        '...HHHHHHH...',
+        '..HhhhHHHHH..',
+        '.HhhHHHHHHHD.',
+        '.HhHHHHHHHDD.',
+        '.HHHHHHHHHDD.',
+        '.HHSSSSSSSHD.',
+        '.HSSESSSESsD.',
+        '.HSSESSSESsH.',
+        '.SPSSSSSSSPs.',
+        '..SSSSMSSSs..',
+        '...sSSSSSs...',
+        '.....sss.....',
+        '...JWRrRWJ...',
+        '..JjJWwWJJK..',
+        '.JjjJWwWJFKK.',
+        '.JjJJJwJJJKK.',
+        '.JjJJJJJJJKK.',
+        '.SjJJJJJJJKs.',
+        '..KJJJJJJJK..',
+        '...LLLLLLl...',
+        '...LLLLLLl...',
+        '...LLl.LLl...',
+        '...LLl.LLl...',
+        '...LLl.LLl...',
+        '..BbBB.BbBB..',
+      ],
+    },
+    bride: {
+      palette: Object.assign({}, BASE, {
+        V: '#f7f5fc', v: '#d6d0e8', // 면사포 (기본 / 그림자)
+        T: '#ffd34d', // 티아라
+        G: '#fffdf8', g: '#eadfcd', d: '#cfbfa6', // 드레스 (기본 / 그림자 / 짙은 그림자)
+        F: '#f27a96', f: '#ffb6c6', n: '#5f9e45', // 부케 꽃 / 꽃 하이라이트 / 잎
+      }),
+      rows: [
+        '.....TFTFT.....',
+        '....HHHHHHH....',
+        '...HhhhHHHHH...',
+        '..VHhhHHHHHDV..',
+        '.VVHhHHHHHHDVv.',
+        '.VHHHHHHHHHHDv.',
+        '.VHHSSSSSSSHDv.',
+        '.VHSSESSSESsHv.',
+        '.VHSSESSSESsHv.',
+        '.VHSPSSSSSPsHv.',
+        'VVHHSSSMSSsHHvv',
+        'VvHHDsSSSsDHHvv',
+        'Vv.HD.sss.DH.vv',
+        'Vv..sGGGGGs..vv',
+        'Vv.SGGGGGGgS.vv',
+        'Vv.SSFFFFFSS.vv',
+        'Vv..GFfFFFg..vv',
+        'Vv..GnFFFng..vv',
+        'Vv..GGGnGGg..vv',
+        'V..gGGGGGGGg..v',
+        '..gGGGGGGGGgd..',
+        '..gGGGGGGGGgd..',
+        '.gGGGGGGGGGGgd.',
+        'gGGGGGGGGGGGgdd',
+        'ggggggggggggddd',
+      ],
+    },
+  };
+
+  // px = 도트 1칸의 화면 크기
+  function spriteSvg(sp, px) {
+    var w = sp.rows[0].length;
+    var h = sp.rows.length;
+    var filled = function (x, y) { return y >= 0 && y < h && x >= 0 && x < w && !!sp.palette[sp.rows[y][x]]; };
+    var rects = '';
+    for (var y = -1; y <= h; y++) {
+      for (var x = -1; x <= w; x++) {
+        var fill = filled(x, y) ? sp.palette[sp.rows[y][x]]
+          : filled(x - 1, y) || filled(x + 1, y) || filled(x, y - 1) || filled(x, y + 1) ? SPRITE_OUTLINE : null;
+        if (fill) rects += '<rect x="' + (x + 1) + '" y="' + (y + 1) + '" width="1" height="1" fill="' + fill + '"/>';
+      }
+    }
+    return '<svg viewBox="0 0 ' + (w + 2) + ' ' + (h + 2) + '" width="' + (w + 2) * px + '" height="' + (h + 2) * px +
+      '" shape-rendering="crispEdges" aria-hidden="true">' + rects + '</svg>';
+  }
+
+  // 방명록 손님 미니미: 이름으로 머리/옷 색을 정해서 사람마다 다르게
+  var GUEST_ROWS = {
+    boy: [
+      '...HHHHH...',
+      '..HhhHHHH..',
+      '.HhHHHHHHD.',
+      '.HHHHHHHHD.',
+      '.HSSSSSSSD.',
+      '.SSESSSESs.',
+      '.SPSSSSSPs.',
+      '..SSSMSSs..',
+      '...sSSSs...',
+      '..CCCCCCC..',
+      '.CcCCCCCCK.',
+      '.SCCCCCCCS.',
+      '..CCCCCCK..',
+      '...LLLLl...',
+      '...LL.Ll...',
+      '...LL.Ll...',
+      '..BBB.BBB..',
+    ],
+    girl: [
+      '...HHHHH...',
+      '..HhhHHHH..',
+      '.HhHHHHHHD.',
+      '.HHHHHHHHD.',
+      '.HSSSSSSSD.',
+      'HSSESSSESsD',
+      'HSPSSSSSPsD',
+      'HHSSSMSSsDD',
+      'HH.sSSSs.DD',
+      'H..CCCCC..D',
+      '..SCcCCCS..',
+      '...CCCCK...',
+      '..CCCCCCK..',
+      '.CCCCCCCCK.',
+      '.KKKKKKKKK.',
+      '...SS.SS...',
+      '..BBB.BBB..',
+    ],
+  };
+  var GUEST_HAIR = [
+    ['#6b3a1f', '#a2643a', '#45220f'], ['#2a2422', '#4e4542', '#151110'], ['#a0703f', '#d0a066', '#6e4a26'],
+    ['#c9a24a', '#ecd07a', '#8f7030'], ['#7a2f3a', '#a85060', '#4f1c24'],
+  ];
+  var GUEST_TOP = [
+    ['#f59ab0', '#ffc4d2', '#d9738c'], ['#8ccbb8', '#b8e6d8', '#5f9e8c'], ['#8fb4e8', '#bcd4f5', '#5f84bd'],
+    ['#f2c94c', '#ffe08a', '#c9a02e'], ['#b9a3e3', '#d8caf3', '#8a74b8'], ['#3f4f7a', '#5f72a3', '#28344f'],
+    ['#f4f1ec', '#ffffff', '#cfc6ba'], ['#f08a6c', '#ffb39c', '#c4604a'],
+  ];
+  var GUEST_BOTTOM = [['#3d5a8a', '#2a3f63'], ['#2c2c33', '#18181d'], ['#c8b08a', '#9e8664']];
+
+  function guestSprite(seed) {
+    var n = 2166136261;
+    for (var i = 0; i < seed.length; i++) n = Math.imul(n ^ seed.charCodeAt(i), 16777619);
+    // 고를 때마다 다시 섞어서 머리/옷 색이 서로 따로 놀게
+    var pick = function (list) {
+      n = Math.imul(n ^ (n >>> 15), 2246822507);
+      n ^= n >>> 13;
+      return list[(n >>> 0) % list.length];
+    };
+    var rows = pick([GUEST_ROWS.boy, GUEST_ROWS.girl]);
+    var hair = pick(GUEST_HAIR), top = pick(GUEST_TOP), bottom = pick(GUEST_BOTTOM);
+    return {
+      rows: rows,
+      palette: Object.assign({}, BASE, {
+        H: hair[0], h: hair[1], D: hair[2],
+        C: top[0], c: top[1], K: top[2],
+        L: bottom[0], l: bottom[1], B: '#4a3426',
+      }),
+    };
+  }
+
+  // ---------- 방명록 미니룸: 방명록 글을 말풍선에 담고 미니미들이 돌아다닌다 ----------
+  var plaza = (function () {
+    var stage = $('#plaza-stage');
+    if (!stage) return { set: function () {}, add: function () {} };
+
+    // 배경 도트 좌표계 (tools/miniroom-lounge.html 과 같은 192x132, 벽-바닥 경계는 2:1 계단)
+    var W = 192, H = 132;
+    var seam = function (x) { return 46 + Math.floor(Math.abs(96 - x) / 2); };
+    var MAX_GUESTS = 10;
+    var MAX_TALKING = 2;
+    var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var chars = [];
+    var visible = false;
+
+    function spot() {
+      for (var tries = 0; tries < 30; tries++) {
+        var x = 26 + Math.random() * 140;
+        var top = seam(x) + 16;
+        var y = top + Math.random() * (124 - top);
+        if (x > 134 && x < 166 && y < 90) continue; // 선물 더미
+        return { x: x, y: y };
+      }
+      return { x: 96, y: 100 };
+    }
+
+    function place(c) {
+      c.el.style.left = (c.x / W) * 100 + '%';
+      c.el.style.top = (c.y / H) * 100 + '%';
+      c.el.style.zIndex = Math.round(c.y) + (c.state === 'talk' ? 200 : 0);
+    }
+
+    function create(opts) {
+      var c = { lines: opts.lines, state: 'idle', until: Date.now() + Math.random() * 2500, lastTalk: 0, line: 0, host: !!opts.host };
+      c.el = document.createElement('div');
+      c.el.className = 'plaza__char';
+      c.el.innerHTML = '<p class="plaza__bubble"></p><div class="plaza__body">' + spriteSvg(opts.sprite, 2) + '</div>';
+      c.bubble = $('.plaza__bubble', c.el);
+      var at = spot();
+      c.x = at.x;
+      c.y = at.y;
+      place(c);
+      c.el.addEventListener('click', function () { if (c.state !== 'talk') talk(c, Date.now()); });
+      stage.appendChild(c.el);
+      chars.push(c);
+      return c;
+    }
+
+    function talk(c, now) {
+      if (c.state === 'walk') {
+        // 걷는 중이면 지금 서 있는 자리에서 멈춘다
+        var cs = getComputedStyle(c.el);
+        c.x = (parseFloat(cs.left) / stage.clientWidth) * W;
+        c.y = (parseFloat(cs.top) / stage.clientHeight) * H;
+        c.el.style.transitionDuration = '0s';
+        c.el.classList.remove('is-walking');
+      }
+      var line = c.lines[c.line++ % c.lines.length];
+      c.bubble.innerHTML = (line.name ? '<b>' + escapeHtml(line.name) + '</b>' : '') + escapeHtml(line.text);
+      c.state = 'talk';
+      c.until = now + Math.min(7000, 3500 + line.text.length * 80);
+      c.lastTalk = now;
+      place(c);
+      c.el.classList.add('is-talking');
+      // 말풍선이 방 밖으로 잘리지 않게 좌우로 밀어 넣는다 (꼬리는 캐릭터 머리 위에 그대로)
+      c.bubble.style.setProperty('--shift', '0px');
+      var b = c.bubble.getBoundingClientRect();
+      var s = stage.getBoundingClientRect();
+      var shift = b.left < s.left + 4 ? s.left + 4 - b.left : b.right > s.right - 4 ? s.right - 4 - b.right : 0;
+      c.bubble.style.setProperty('--shift', shift + 'px');
+    }
+
+    function walk(c, now) {
+      var to = spot();
+      var dist = Math.hypot(to.x - c.x, (to.y - c.y) * 2);
+      var sec = Math.max(1.5, dist / 14);
+      c.x = to.x;
+      c.y = to.y;
+      c.state = 'walk';
+      c.until = now + sec * 1000;
+      c.el.style.transitionDuration = sec + 's';
+      c.el.classList.add('is-walking');
+      place(c);
+    }
+
+    // 근처에서 이미 말하는 중이면 말풍선이 겹치니 기다린다
+    function crowded(c) {
+      return chars.some(function (o) {
+        return o !== c && o.state === 'talk' && Math.abs(o.x - c.x) < 70 && Math.abs(o.y - c.y) < 60;
+      });
+    }
+
+    function tick() {
+      if (!visible || document.hidden) return;
+      var now = Date.now();
+      var talking = chars.filter(function (c) { return c.state === 'talk'; }).length;
+      chars.forEach(function (c) {
+        if (now < c.until) return;
+        if (c.state === 'talk') {
+          c.el.classList.remove('is-talking');
+          talking--;
+        } else if (c.state === 'walk') {
+          c.el.classList.remove('is-walking');
+        }
+        var wantsTalk = talking < MAX_TALKING && now - c.lastTalk > (c.host ? 15000 : 8000) && Math.random() < 0.35 && !crowded(c);
+        if (c.state !== 'talk' && wantsTalk) {
+          talk(c, now);
+          talking++;
+        } else if (c.state !== 'idle' || still) {
+          c.state = 'idle';
+          c.until = now + 1200 + Math.random() * 2800;
+          place(c);
+        } else {
+          walk(c, now);
+        }
+      });
+    }
+
+    var hosts = [
+      create({ sprite: SPRITES.groom, host: true, lines: [{ text: '방명록 남겨주세요!' }] }),
+      create({ sprite: SPRITES.bride, host: true, lines: [{ text: '여기서 같이 놀아요♥' }] }),
+    ];
+
+    function guestLine(item) {
+      var text = String(item.message).replace(/\s+/g, ' ').trim();
+      return { name: item.name, text: text.length > 36 ? text.slice(0, 35) + '…' : text };
+    }
+
+    function addGuest(item) {
+      var c = create({ sprite: guestSprite(String(item.id || item.name)), lines: [guestLine(item)] });
+      var guests = chars.filter(function (g) { return !g.host; });
+      if (guests.length > MAX_GUESTS) {
+        var old = guests[0];
+        old.el.remove();
+        chars.splice(chars.indexOf(old), 1);
+      }
+      return c;
+    }
+
+    function setHostLines(hasGuests) {
+      hosts[0].lines = [{ text: hasGuests ? '와주셔서 고마워요!' : '방명록 남겨주세요!' }];
+      hosts[1].lines = [{ text: hasGuests ? '축하 메시지 다 읽고 있어요♥' : '여기서 같이 놀아요♥' }];
+    }
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) { visible = entries[0].isIntersecting; }).observe(stage);
+    } else {
+      visible = true;
+    }
+    setInterval(tick, 250);
+
+    return {
+      // 처음 불러온 방명록(최신순)으로 손님을 채운다
+      set: function (items) {
+        items.slice(0, MAX_GUESTS).reverse().forEach(addGuest);
+        setHostLines(items.length > 0);
+      },
+      // 방금 쓴 글은 바로 말하게
+      add: function (item) {
+        talk(addGuest(item), Date.now());
+        setHostLines(true);
+      },
+    };
+  })();
+
   // ---------- 방명록 ----------
   (function initGuestbook() {
     if (!C.guestbookApi) return;
@@ -245,10 +583,12 @@
     }
 
     function load() {
+      var first = !cursor;
       moreBtn.disabled = true;
       request('GET', api + (cursor ? '?cursor=' + cursor : ''))
         .then(function (data) {
           data.items.forEach(function (item) { listEl.appendChild(renderItem(item)); });
+          if (first) plaza.set(data.items);
           cursor = data.nextCursor;
           moreBtn.hidden = !cursor;
           updateEmpty();
@@ -274,6 +614,7 @@
       request('POST', api, body)
         .then(function (data) {
           listEl.insertBefore(renderItem(data.item), listEl.firstChild);
+          plaza.add(data.item);
           form.reset();
           updateEmpty();
           toast('방명록이 등록되었습니다.');
@@ -333,106 +674,6 @@
     var room = C.miniroom;
     if (!room) return;
 
-    // 싸이월드 미니미 도트 (글자 하나 = 1픽셀, '.' 은 투명). 외곽선은 그릴 때 자동으로 둘러진다
-    var SPRITE_OUTLINE = '#3a2418';
-    // 빛은 왼쪽 위에서: 소문자/별도 글자로 하이라이트·그림자 톤을 둔다
-    var BASE = {
-      H: '#6b3a1f', h: '#a2643a', D: '#45220f', // 머리 (기본 / 하이라이트 / 그림자)
-      S: '#ffdcb8', s: '#efbc93', // 피부 (기본 / 그림자)
-      P: '#f6a3a3', E: '#2a1a10', M: '#c0504a', // 볼터치 / 눈 / 입
-    };
-    var SPRITES = {
-      groom: {
-        palette: Object.assign({}, BASE, {
-          J: '#2c2e3b', j: '#4a4e63', K: '#17181f', // 턱시도 (기본 / 하이라이트 / 그림자)
-          W: '#ffffff', w: '#d9dee8', // 셔츠
-          R: '#d23434', r: '#8e1f1f', // 나비넥타이
-          F: '#f27a96', // 부토니에르
-          L: '#24252f', l: '#121219', // 바지
-          B: '#151515', b: '#6a6a6a', // 구두 (기본 / 광택)
-        }),
-        rows: [
-          '...HHHHHHH...',
-          '..HhhhHHHHH..',
-          '.HhhHHHHHHHD.',
-          '.HhHHHHHHHDD.',
-          '.HHHHHHHHHDD.',
-          '.HHSSSSSSSHD.',
-          '.HSSESSSESsD.',
-          '.HSSESSSESsH.',
-          '.SPSSSSSSSPs.',
-          '..SSSSMSSSs..',
-          '...sSSSSSs...',
-          '.....sss.....',
-          '...JWRrRWJ...',
-          '..JjJWwWJJK..',
-          '.JjjJWwWJFKK.',
-          '.JjJJJwJJJKK.',
-          '.JjJJJJJJJKK.',
-          '.SjJJJJJJJKs.',
-          '..KJJJJJJJK..',
-          '...LLLLLLl...',
-          '...LLLLLLl...',
-          '...LLl.LLl...',
-          '...LLl.LLl...',
-          '...LLl.LLl...',
-          '..BbBB.BbBB..',
-        ],
-      },
-      bride: {
-        palette: Object.assign({}, BASE, {
-          V: '#f7f5fc', v: '#d6d0e8', // 면사포 (기본 / 그림자)
-          T: '#ffd34d', // 티아라
-          G: '#fffdf8', g: '#eadfcd', d: '#cfbfa6', // 드레스 (기본 / 그림자 / 짙은 그림자)
-          F: '#f27a96', f: '#ffb6c6', n: '#5f9e45', // 부케 꽃 / 꽃 하이라이트 / 잎
-        }),
-        rows: [
-          '.....TFTFT.....',
-          '....HHHHHHH....',
-          '...HhhhHHHHH...',
-          '..VHhhHHHHHDV..',
-          '.VVHhHHHHHHDVv.',
-          '.VHHHHHHHHHHDv.',
-          '.VHHSSSSSSSHDv.',
-          '.VHSSESSSESsHv.',
-          '.VHSSESSSESsHv.',
-          '.VHSPSSSSSPsHv.',
-          'VVHHSSSMSSsHHvv',
-          'VvHHDsSSSsDHHvv',
-          'Vv.HD.sss.DH.vv',
-          'Vv..sGGGGGs..vv',
-          'Vv.SGGGGGGgS.vv',
-          'Vv.SSFFFFFSS.vv',
-          'Vv..GFfFFFg..vv',
-          'Vv..GnFFFng..vv',
-          'Vv..GGGnGGg..vv',
-          'V..gGGGGGGGg..v',
-          '..gGGGGGGGGgd..',
-          '..gGGGGGGGGgd..',
-          '.gGGGGGGGGGGgd.',
-          'gGGGGGGGGGGGgdd',
-          'ggggggggggggddd',
-        ],
-      },
-    };
-
-    function spriteSvg(sp) {
-      var w = sp.rows[0].length;
-      var h = sp.rows.length;
-      var filled = function (x, y) { return y >= 0 && y < h && x >= 0 && x < w && !!sp.palette[sp.rows[y][x]]; };
-      var rects = '';
-      for (var y = -1; y <= h; y++) {
-        for (var x = -1; x <= w; x++) {
-          var fill = filled(x, y) ? sp.palette[sp.rows[y][x]]
-            : filled(x - 1, y) || filled(x + 1, y) || filled(x, y - 1) || filled(x, y + 1) ? SPRITE_OUTLINE : null;
-          if (fill) rects += '<rect x="' + (x + 1) + '" y="' + (y + 1) + '" width="1" height="1" fill="' + fill + '"/>';
-        }
-      }
-      var px = 3; // 도트 1칸 = 3px
-      return '<svg viewBox="0 0 ' + (w + 2) + ' ' + (h + 2) + '" width="' + (w + 2) * px + '" height="' + (h + 2) * px +
-        '" shape-rendering="crispEdges" aria-hidden="true">' + rects + '</svg>';
-    }
-
     var stage = $('#miniroom-stage');
     room.characters.forEach(function (ch, i) {
       var el = document.createElement('div');
@@ -441,7 +682,7 @@
       el.style.animationDelay = i * 0.4 + 's';
       var body = ch.image
         ? '<img src="' + escapeHtml(ch.image) + '" alt="" />'
-        : spriteSvg(SPRITES[ch.sprite] || SPRITES.groom);
+        : spriteSvg(SPRITES[ch.sprite] || SPRITES.groom, 3);
       el.innerHTML = (ch.bubble ? '<p class="miniroom__bubble">' + escapeHtml(ch.bubble) + '</p>' : '') +
         '<div class="miniroom__body">' + body + '</div>';
       stage.appendChild(el);

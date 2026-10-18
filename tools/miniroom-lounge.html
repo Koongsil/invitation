@@ -1,0 +1,160 @@
+<!doctype html>
+<!-- 방명록 미니룸 도트 배경 생성기 (192x132 캔버스). 수정 후 아래 명령으로 PNG 다시 만들기:
+     chrome --headless=new --force-device-scale-factor=1 --window-size=192,132 --screenshot=public/images/miniroom-lounge.png tools/miniroom-lounge.html -->
+<html><body style="margin:0;background:#000"><canvas id="c" width="192" height="132" style="display:block"></canvas><script>(function () {
+var W = 192, H = 132, CX = 96, CY = 46;
+var ctx = document.getElementById('c').getContext('2d');
+function px(x, y, c) { if (x < 0 || y < 0 || x >= W || y >= H) return; ctx.fillStyle = c; ctx.fillRect(x, y, 1, 1); }
+function rect(x, y, w, h, c) { for (var j = 0; j < h; j++) for (var i = 0; i < w; i++) px(x + i, y + j, c); }
+function hash(x, y) { var n = (x * 374761393 + y * 668265263) ^ 0x5bd1e995; n = (n ^ (n >>> 13)) * 1274126177; return ((n ^ (n >>> 16)) >>> 0) / 4294967296; }
+// 벽과 바닥 경계 (2:1 계단)
+function seam(x) { return x <= CX ? CY + Math.floor((CX - x) / 2) : CY + Math.floor((x - CX) / 2); }
+// 벽에 붙은 상자: 열마다 seam 기준으로 올려서 벽 기울기를 따라간다 (i, j = 상자 안 좌표)
+function wallBox(x0, w, up, h, color) {
+  for (var i = 0; i < w; i++) for (var j = 0; j < h; j++) {
+    var c = color(i, j);
+    if (c) px(x0 + i, seam(x0 + i) - up + j, c);
+  }
+}
+
+// ---------- 벽: 줄무늬 벽지 + 나무 징두리 ----------
+for (var x = 0; x < W; x++) {
+  var left = x < CX, s = seam(x);
+  for (var y = 0; y < s; y++) {
+    var d = s - y, c;
+    if (d <= 10) c = d === 10 ? '#e8c39a' : (left ? '#b98656' : '#c99a6a');
+    else if (d === 11) c = '#9a6a40';
+    else c = x % 8 < 3 ? (left ? '#f4d5d7' : '#f8e0df') : (left ? '#fae6e6' : '#fdf0ee');
+    if (x === CX && d > 11) c = '#e6c3c3';
+    px(x, y, c);
+  }
+}
+
+// ---------- 축하 가랜드 ----------
+function bunting(x0, y0, x1, y1, sag) {
+  var colors = ['#f59ab0', '#ffd34d', '#8ccbb8', '#a8c8f0', '#ffffff'], n = 0;
+  for (var x = x0; x <= x1; x++) {
+    var t = (x - x0) / (x1 - x0);
+    var y = Math.round(y0 + (y1 - y0) * t + sag * 4 * t * (1 - t));
+    px(x, y, '#9a8a6a');
+    if ((x - x0) % 8 === 2 && x + 4 <= x1) {
+      var c = colors[n++ % colors.length];
+      for (var j = 0; j < 5; j++) for (var i = j >> 1; i < 5 - (j >> 1); i++) px(x + i, y + 1 + j, c);
+    }
+  }
+}
+bunting(0, 8, CX, 2, 8);
+bunting(CX, 2, W - 1, 8, 8);
+
+// ---------- 왼쪽 벽: 방명록 코르크 보드 ----------
+var NOTE = ['#fff1a8', '#ffd0dc', '#c9efe2', '#d6e6ff', '#ffffff', '#ffe0b8', '#e8dcff'];
+wallBox(20, 56, 46, 26, function (i, j) {
+  if (i === 0 || i === 55 || j === 0 || j === 25) return '#7a4f2c';
+  if (i === 1 || j === 1) return '#a06a3c';
+  return hash(i, j) > 0.8 ? '#b9844f' : '#cf9d66';
+});
+[[5, 5], [14, 4], [23, 6], [33, 4], [43, 5], [9, 14], [19, 15], [29, 13], [39, 15]].forEach(function (p, n) {
+  var c = NOTE[n % NOTE.length];
+  wallBox(20 + p[0], 8, 46 - p[1], 7, function (i, j) {
+    if (j === 0 && i === 3) return '#e8607f'; // 압정
+    if (j > 0 && (j === 2 || j === 4) && i > 0 && i < 7 - (j === 4 ? 2 : 0)) return '#b8aca0'; // 글씨 줄
+    if (i === 7 || j === 6) return '#c8b49a'; // 그림자
+    return c;
+  });
+});
+
+// ---------- 오른쪽 벽: 밤하늘 창문 ----------
+wallBox(118, 30, 50, 28, function (i, j) {
+  if (i === 0 || i === 29 || j === 0 || j === 27 || i === 14 || j === 13) return '#ffffff';
+  if (i === 1 || j === 1) return '#d9d0e6';
+  var mx = i - 21, my = j - 7;
+  if (mx * mx + my * my <= 9 && (mx + 1) * (mx + 1) + (my - 1) * (my - 1) > 6) return '#fff3c4'; // 초승달
+  if (hash(i, j) > 0.975) return '#ffffff'; // 별
+  return j < 9 ? '#2f3a6b' : j < 18 ? '#3d4a80' : '#4f5d93';
+});
+// 커튼
+[[115, 4], [146, 4]].forEach(function (c) {
+  wallBox(c[0], c[1], 53, 34, function (i, j) { return (i + (j >> 2)) % 2 ? '#e88fa3' : '#f5a9b9'; });
+});
+
+// ---------- 오른쪽 벽: 하트 액자 ----------
+wallBox(160, 18, 40, 15, function (i, j) {
+  if (i === 0 || i === 17 || j === 0 || j === 14) return '#b98048';
+  var HEART = ['..RR.RR..', '.RhRRRRR.', '.RRRRRRR.', '..RRRRR..', '...RRR...', '....R....'];
+  var r = HEART[j - 4], ch = r && r[i - 4];
+  return ch === 'R' ? '#e8607f' : ch === 'h' ? '#ffb6c6' : '#fffdf8';
+});
+
+// ---------- 둥근 벽시계 (모서리 위) ----------
+for (var y = 14; y <= 26; y++) for (var x = 90; x <= 102; x++) {
+  var d = Math.hypot(x - 96, y - 20);
+  if (d <= 6.4) px(x, y, d > 5.4 ? '#7a4f2c' : '#fffdf8');
+}
+px(96, 17, '#3d3a36'); px(96, 18, '#3d3a36'); px(96, 19, '#3d3a36'); px(96, 20, '#3d3a36'); px(97, 20, '#3d3a36'); px(98, 20, '#3d3a36');
+
+// ---------- 바닥: 나무 마루 (2:1 결) ----------
+for (var x = 0; x < W; x++) {
+  for (var y = seam(x); y < H; y++) {
+    var u = x + 2 * y, row = Math.floor(u / 10), along = 2 * y - x + row * 17;
+    var c = ((u % 10) + 10) % 10 === 0 ? '#b07a45'
+      : (((along % 40) + 40) % 40 === 0 ? '#bb8650' : (row % 3 === 0 ? '#e0b07a' : row % 3 === 1 ? '#d8a66f' : '#dcab74'));
+    px(x, y, c);
+  }
+  px(x, seam(x), '#9a6a40');
+}
+
+// ---------- 러그 (가운데) ----------
+for (var y = 76; y < H; y++) for (var x = 40; x < 152; x++) {
+  var dx = (x - 96 + 0.5) / 50, dy = (y - 101) / 25, d = dx * dx + dy * dy;
+  if (d > 1) continue;
+  var c = d > 0.86 ? '#e47f95' : d > 0.78 ? '#fdeef0' : d > 0.7 ? '#e47f95' : '#f7c4cd';
+  if (d > 0.78 && d <= 0.86 && (x + y) % 4 < 2) c = '#f7c4cd';
+  if (d < 0.08) c = '#fdeef0';
+  px(x, y, c);
+}
+
+// ---------- 소품 공통: inside(x, y) 영역을 color(x, y) 로 칠하고 둘레에 외곽선 ----------
+function shape(x0, y0, x1, y1, inside, color, outline) {
+  for (var y = y0 - 1; y <= y1 + 1; y++) for (var x = x0 - 1; x <= x1 + 1; x++) {
+    if (inside(x, y)) px(x, y, color(x, y));
+    else if (outline && (inside(x - 1, y) || inside(x + 1, y) || inside(x, y - 1) || inside(x, y + 1))) px(x, y, outline);
+  }
+}
+function sprite(x0, y0, rows, palette, outline) {
+  var at = function (x, y) { var r = rows[y - y0]; return r && palette[r[x - x0]]; };
+  shape(x0, y0, x0 + rows[0].length - 1, y0 + rows.length - 1, function (x, y) { return !!at(x, y); }, at, outline);
+}
+
+// ---------- 스탠드 조명 (왼쪽 벽 앞) ----------
+for (var y = 56; y <= 92; y++) px(11, y, '#5a4a3a');
+rect(7, 92, 9, 2, '#5a4a3a');
+shape(5, 46, 17, 55, function (x, y) { var hw = 3 + Math.floor((y - 46) / 2); return y >= 46 && y <= 55 && Math.abs(x - 11 + 0.5) < hw; },
+  function (x, y) { return y === 55 ? '#f0c060' : x > 12 ? '#ffe2a0' : '#fff1c8'; }, '#b08a40');
+
+// ---------- 선물 더미 (오른쪽 벽 앞) ----------
+shape(140, 70, 151, 80, function (x, y) { return x >= 140 && x <= 151 && y >= 70 && y <= 80; },
+  function (x, y) { return x === 145 || x === 146 || y === 74 ? '#ffffff' : x >= 149 ? '#e3869d' : '#f6a9bb'; }, '#8a4a5a');
+shape(152, 74, 159, 81, function (x, y) { return x >= 152 && x <= 159 && y >= 74 && y <= 81; },
+  function (x, y) { return x === 155 || y === 77 ? '#ffd34d' : x >= 158 ? '#8ccbb8' : '#a8e0cf'; }, '#3f7a6a');
+shape(143, 63, 149, 69, function (x, y) { return x >= 143 && x <= 149 && y >= 63 && y <= 69; },
+  function (x, y) { return x === 146 || y === 66 ? '#f59ab0' : x >= 148 ? '#bcc8ee' : '#d6e0ff'; }, '#4a5a8a');
+sprite(144, 60, ['Y.Y', '.Y.'], { Y: '#ffd34d' }, '#a07a2a');
+
+// ---------- 화분 (앞 양쪽 모서리) ----------
+function pot(cx, by) {
+  for (var j = 0; j < 8; j++) {
+    var hw = 6 - Math.floor(j / 3);
+    for (var i = -hw; i < hw; i++) px(cx + i, by - 8 + j, i === -hw || i === hw - 1 || j === 7 ? '#7a5230' : (i < 0 ? '#c99460' : '#b07e4c'));
+  }
+  rect(cx - 7, by - 10, 14, 2, '#8f6238');
+  for (var y = by - 26; y < by - 9; y++) for (var x = cx - 10; x < cx + 10; x++) {
+    var d = Math.hypot(x - cx + 0.5, (y - (by - 18)) / 0.95);
+    if (d < 9.5) px(x, y, d > 8.6 ? '#3f6b35' : (x - cx < -2 && y < by - 18 ? '#8dbd69' : d < 6 ? '#6c9d55' : '#55853f'));
+  }
+  [[-5, -21, '#ffffff'], [2, -24, '#f59ab0'], [4, -17, '#f7c48f'], [-3, -14, '#f59ab0'], [0, -19, '#ffffff']].forEach(function (f) {
+    rect(cx + f[0], by + f[1], 2, 2, f[2]);
+  });
+}
+pot(14, 130);
+pot(178, 130);
+})();</script></body></html>

@@ -708,6 +708,106 @@ button {
   .miniroom__char { animation: none; }
 }
 
+/* ---------- 7-1. 방명록 미니룸 ---------- */
+.plaza {
+  margin-bottom: 20px;
+}
+
+.plaza__char {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  transition-property: left, top;
+  transition-timing-function: linear;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 발밑 그림자 */
+.plaza__char::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  width: 20px;
+  height: 5px;
+  margin-left: -10px;
+  border-radius: 50%;
+  background: rgba(90, 50, 20, 0.22);
+  z-index: -1;
+}
+
+.plaza__body svg {
+  display: block;
+}
+
+.plaza__char.is-walking .plaza__body {
+  animation: plaza-walk 0.36s steps(2) infinite;
+}
+
+.plaza__bubble {
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 7px);
+  transform: translateX(calc(-50% + var(--shift, 0px)));
+  width: max-content;
+  max-width: 140px;
+  padding: 5px 8px;
+  background: #fff;
+  border: 1px solid #9a9a9a;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: left;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  color: #333;
+}
+
+.plaza__bubble b {
+  display: block;
+  font-size: 10px;
+  color: var(--accent);
+}
+
+.plaza__char.is-talking .plaza__bubble {
+  display: block;
+  animation: plaza-pop 0.2s steps(2);
+}
+
+/* 꼬리는 말풍선이 밀려나도 캐릭터 머리 위에 */
+.plaza__bubble::before,
+.plaza__bubble::after {
+  content: '';
+  position: absolute;
+  left: calc(50% - var(--shift, 0px));
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+}
+
+.plaza__bubble::before {
+  top: 100%;
+  border-top-color: #9a9a9a;
+}
+
+.plaza__bubble::after {
+  top: calc(100% - 1px);
+  border-top-color: #fff;
+}
+
+@keyframes plaza-walk {
+  50% { transform: translateY(-2px); }
+}
+
+@keyframes plaza-pop {
+  from { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plaza__char.is-walking .plaza__body,
+  .plaza__char.is-talking .plaza__bubble { animation: none; }
+}
+
 .footer {
   padding: 24px;
   text-align: center;
