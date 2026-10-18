@@ -45,22 +45,35 @@ window.INVITATION = {
 
   // 사진 경로
   images: {
-    main: "images/main.jpg", // 메인 커버 (세로 3:4 권장)
+    main: "images/gallery/001__JG_0750_1.jpg", // 메인 커버 (세로 3:4 권장)
     greeting: "images/greeting.jpg", // 인사말 아래 사진 (가로 4:3 권장)
     // 오시는 길 약도 이미지 (누르면 크게 보기)
     locationMap: "images/map.jpg", // 약도
     locationDirection: "images/direction.jpg", // 교통 안내
     // 갤러리 (개수 자유롭게 추가/삭제)
     gallery: [
-      "images/gallery/01.jpg",
-      "images/gallery/02.jpg",
-      "images/gallery/03.jpg",
-      "images/gallery/04.jpg",
-      "images/gallery/05.jpg",
-      "images/gallery/06.jpg",
-      "images/gallery/07.jpg",
-      "images/gallery/08.jpg",
-      "images/gallery/09.jpg",
+      "images/gallery/001__JG_0750_1.jpg",
+      "images/gallery/002__JG_0261_1.jpg",
+      "images/gallery/003__JG_0286_1.jpg",
+      "images/gallery/004__JG_0401_1.jpg",
+      "images/gallery/005__JG_0487_1.jpg",
+      "images/gallery/006__JG_0053_1.jpg",
+      "images/gallery/007__JG_0099_1.jpg",
+      "images/gallery/008__JG_0551_1.jpg",
+      "images/gallery/009__JG_1077_1.jpg",
+      "images/gallery/010__JG_0523_1.jpg",
+      "images/gallery/011__JG_1110_1.jpg",
+      "images/gallery/012__JG_1565_1.jpg",
+      "images/gallery/013__JG_0987_1.jpg",
+      "images/gallery/014__JG_1216_1.jpg",
+      "images/gallery/015__JG_1278_1.jpg",
+      "images/gallery/016__JG_1638_1.jpg",
+      "images/gallery/017__JG_1713_1.jpg",
+      "images/gallery/018__JG_1728_1.jpg",
+      "images/gallery/019__JG_1739_1.jpg",
+      "images/gallery/020__JG_1880_1.jpg",
+      "images/gallery/021__JG_1831_1.jpg",
+      "images/gallery/022__JG_0792_1.jpg",
     ],
   },
 

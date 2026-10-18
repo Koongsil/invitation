@@ -99,6 +99,10 @@
         <p class="section__eyebrow">GALLERY</p>
         <h2 class="section__title">우리의 순간들</h2>
         <div class="gallery__grid" id="gallery"></div>
+        <button type="button" class="gallery__more" id="galleryMore" hidden>
+          <span>More</span>
+          <svg class="gallery__more-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+        </button>
       </section>
 
       <!-- 5. 오시는 길 -->
@@ -139,6 +143,49 @@
               data-label="교통 안내"
             ></div>
           </a> -->
+        </div>
+        <div class="location__transport">
+          <h3>지하철</h3>
+          <p>5호선(방화행) 발산역 하차 7번 출구 도보 2분</p>
+
+          <h3>버스 (발산역 하차)</h3>
+          <dl>
+            <dt>지선(초록)</dt>
+            <dd>
+              <b>4번 출구</b> 6630, 6712<br />
+              <b>9번 출구</b> 6632, 6645, 6648, 6712
+            </dd>
+            <dt>간선(파랑)</dt>
+            <dd>
+              <b>5번 출구</b> 661<br />
+              <b>중앙차로</b> 601, 605, 654, 6633
+            </dd>
+            <dt>경기버스</dt>
+            <dd>60, 60-3</dd>
+            <dt>광역버스</dt>
+            <dd>3000, 3000-1</dd>
+            <dt>공항버스</dt>
+            <dd>6003</dd>
+            <dt>마을버스</dt>
+            <dd>강서 05, 06</dd>
+          </dl>
+
+          <h3>승용차 이용 시</h3>
+          <dl class="is-stacked">
+            <dt>분당 방면</dt>
+            <dd>외곽 순환도로(김포공항 방향) › 김포공항 정문에서 좌회전 › 시내 쪽으로 직진</dd>
+            <dt>강남, 지방(영동) 방면</dt>
+            <dd>올림픽대로 › 발산역 지나 직진 › 발산 사거리에서 우회전 후 우측</dd>
+            <dt>인천 방면</dt>
+            <dd>경인고속도로 › 신월IC(김포동 방향) › 발산역 이정표에서 우회전 › 발산 사거리에서 우회전 후 우측</dd>
+            <dt>일산 방면</dt>
+            <dd>
+              경부고속도로 › 서울(한남대교 진입) › 올림픽대로(김포공항 방면) › 가양대교 사거리(발산 램프 방향) 발산 램프 2번째 사거리 지나 우측<br />
+              <small>(서부간선도로 끝 지점 성산대교 건너지 말고 P턴하면 공항로)</small>
+            </dd>
+            <dt>남부 순환로 방면</dt>
+            <dd>남부 순환로 › 김포공항 이정표 › 발산 사거리 우회전 후 우측</dd>
+          </dl>
         </div>
         <div class="location__apps">
           <a class="btn btn--app" id="link-naver" target="_blank" rel="noopener"

@@ -100,6 +100,17 @@
     fillPhoto(el, src);
   });
 
+  var galleryMore = $('#galleryMore');
+  if (C.images.gallery.length > 9) {
+    galleryMore.hidden = false;
+    galleryMore.addEventListener('click', function () {
+      var expanded = gallery.classList.toggle('is-expanded');
+      $('span', galleryMore).textContent = expanded ? 'Close' : 'More';
+      // 접을 때는 갤러리 위치로 스크롤을 되돌림
+      if (!expanded) gallery.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
   var lb = $('#lightbox');
   var lbIndex = 0;
 

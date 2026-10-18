@@ -285,6 +285,56 @@ button {
   font-size: 11px;
 }
 
+/* 처음엔 9장(3x3)만 보이고, More 버튼을 누르면 펼침 */
+.gallery__grid:not(.is-expanded) .photo:nth-child(n + 10) {
+  display: none;
+}
+
+/* 마지막 줄 위로 겹쳐서 아래→위로 옅어지는 그라데이션 */
+.gallery__more {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  height: 120px;
+  margin-top: -96px;
+  padding-bottom: 4px;
+  border: 0;
+  background: linear-gradient(to top, var(--bg) 30%, rgba(253, 251, 248, 0));
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--text-sub);
+  cursor: pointer;
+}
+
+.gallery__more-arrow {
+  width: 16px;
+  height: 16px;
+  margin-bottom: 4px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 펼친 상태: 그라데이션 없이 아래에 놓고 화살표를 위로 */
+.gallery__grid.is-expanded + .gallery__more {
+  height: auto;
+  margin-top: 16px;
+  background: none;
+}
+
+.gallery__grid.is-expanded + .gallery__more .gallery__more-arrow {
+  transform: rotate(180deg);
+}
+
+.gallery__more[hidden] {
+  display: none;
+}
+
 /* ---------- 5. 오시는 길 ---------- */
 .location__venue {
   font-size: 14px;
@@ -305,18 +355,57 @@ button {
 }
 
 .location__transport {
-  margin-top: 36px;
+  margin: 8px 0 32px;
   text-align: left;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.location__transport h3 {
   font-size: 14px;
+  font-weight: 500;
+  margin: 24px 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.location__transport h3:first-child {
+  margin-top: 0;
+}
+
+.location__transport p,
+.location__transport dd {
+  color: var(--text-sub);
+}
+
+/* 버스: 구분 | 번호 를 두 칸으로 */
+.location__transport dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
 }
 
 .location__transport dt {
   font-weight: 500;
-  margin-top: 16px;
+  white-space: nowrap;
 }
 
-.location__transport dd {
-  color: var(--text-sub);
+.location__transport dd b {
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* 승용차: 방면 이름이 길어서 위아래로 */
+.location__transport dl.is-stacked {
+  display: block;
+}
+
+.location__transport dl.is-stacked dd {
+  margin-bottom: 10px;
+}
+
+.location__transport small {
+  font-size: 12px;
 }
 
 .location__guides {
