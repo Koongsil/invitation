@@ -54,7 +54,6 @@ window.INVITATION = {
     gallery: [
       "images/gallery/001__JG_0750_1.jpg",
       "images/gallery/002__JG_0261_1.jpg",
-      "images/gallery/003__JG_0286_1.jpg",
       "images/gallery/004__JG_0401_1.jpg",
       "images/gallery/005__JG_0487_1.jpg",
       "images/gallery/006__JG_0053_1.jpg",
