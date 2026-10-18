@@ -352,10 +352,11 @@ button {
 .location__apps {
   display: flex;
   gap: 6px;
+  margin-top: 48px;
 }
 
 .location__transport {
-  margin: 8px 0 32px;
+  margin-top: 8px;
   text-align: left;
   font-size: 13px;
   line-height: 1.6;

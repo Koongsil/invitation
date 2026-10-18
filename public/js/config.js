@@ -28,7 +28,7 @@ window.INVITATION = {
     address: "서울특별시 강서구 공항대로36길 57",
     tel: "1661-3303",
     naverMap: "https://map.naver.com/p/directions/-/14119422.2944028,4516954.0285369,%EB%8D%94%EB%89%B4%EC%BB%A8%EB%B2%A4%EC%85%98%EC%9B%A8%EB%94%A9,35751363,PLACE_POI/-/car?c=18.00,0,0,0,dh",
-    kakaoMap: "https://map.kakao.com/",
+    kakaoMap: "https://place.map.kakao.com/26314220?fromAppLink=true",
     transport: [{ title: "주차", desc: "웨딩홀 지하 주차장 2시간 무료" }],
   },
 

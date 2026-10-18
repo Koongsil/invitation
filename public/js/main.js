@@ -33,13 +33,19 @@
     .join('<br />');
 
   // ---------- 사진 (없으면 자리 표시) ----------
-  function fillPhoto(el, src) {
+  function fillPhoto(el, src, eager) {
     el.dataset.path = src;
     el.classList.add('is-empty');
     // lazy 이미지는 DOM에 붙어 있어야 로드되므로 먼저 붙이고, 로드되면 자리 표시를 걷어낸다
     var img = new Image();
     img.alt = '';
-    img.loading = 'lazy';
+    img.decoding = 'async';
+    if (eager) {
+      // 첫 화면(메인 커버)은 lazy 없이 가장 먼저 받는다
+      img.fetchPriority = 'high';
+    } else {
+      img.loading = 'lazy';
+    }
     img.onload = function () { el.classList.remove('is-empty'); };
     img.onerror = function () { img.remove(); };
     img.src = src;
@@ -47,7 +53,7 @@
   }
 
   $$('[data-img]').forEach(function (el) {
-    fillPhoto(el, C.images[el.dataset.img]);
+    fillPhoto(el, C.images[el.dataset.img], el.dataset.img === 'main');
   });
 
   // ---------- 연락하기 ----------
