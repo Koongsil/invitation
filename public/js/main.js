@@ -33,11 +33,19 @@
     .join('<br />');
 
   // ---------- 사진 (없으면 자리 표시) ----------
-  function fillPhoto(el, src, eager) {
+  // 갤러리 사진은 tools/resize-gallery.sh 로 만든 축소본(thumb/, large/)을 쓰고,
+  // 축소본이 없으면 원본으로 대신한다
+  function sized(src, size) {
+    if (!size || src.indexOf('images/gallery/') !== 0) return src;
+    return src.replace('images/gallery/', 'images/gallery/' + size + '/');
+  }
+
+  function fillPhoto(el, src, eager, size) {
     el.dataset.path = src;
     el.classList.add('is-empty');
     // lazy 이미지는 DOM에 붙어 있어야 로드되므로 먼저 붙이고, 로드되면 자리 표시를 걷어낸다
     var img = new Image();
+    var url = sized(src, size);
     img.alt = '';
     img.decoding = 'async';
     if (eager) {
@@ -47,14 +55,49 @@
       img.loading = 'lazy';
     }
     img.onload = function () { el.classList.remove('is-empty'); };
-    img.onerror = function () { img.remove(); };
-    img.src = src;
+    img.onerror = function () {
+      if (url !== src) {
+        url = src;
+        img.src = src;
+      } else {
+        img.remove();
+      }
+    };
+    img.src = url;
     el.appendChild(img);
+    return img;
   }
 
+  var coverImg = null;
   $$('[data-img]').forEach(function (el) {
-    fillPhoto(el, C.images[el.dataset.img], el.dataset.img === 'main');
+    var isMain = el.dataset.img === 'main';
+    var img = fillPhoto(el, C.images[el.dataset.img], isMain, isMain ? 'large' : null);
+    if (isMain) coverImg = img;
   });
+
+  // ---------- 첫 화면 로딩 ----------
+  // 메인 사진이 준비되면(최소 0.8초, 최대 4초) 로딩 화면을 걷어낸다
+  (function hideLoader() {
+    var loader = $('#loader');
+    if (!loader) return;
+    var start = Date.now();
+    var done = false;
+    function finish() {
+      if (done) return;
+      done = true;
+      setTimeout(function () {
+        loader.classList.add('is-hidden');
+        setTimeout(function () { loader.remove(); }, 600);
+      }, Math.max(0, 800 - (Date.now() - start)));
+    }
+    if (!coverImg || coverImg.complete) {
+      finish();
+    } else {
+      coverImg.addEventListener('load', finish);
+      coverImg.addEventListener('error', function () { if (!coverImg.isConnected) finish(); });
+    }
+    setTimeout(finish, 4000);
+  })();
 
   // ---------- 연락하기 ----------
   [
@@ -103,7 +146,7 @@
     el.dataset.label = '갤러리 ' + (i + 1);
     el.addEventListener('click', function () { openLightbox(i); });
     gallery.appendChild(el);
-    fillPhoto(el, src);
+    fillPhoto(el, src, false, 'thumb');
   });
 
   var galleryMore = $('#galleryMore');
@@ -129,7 +172,11 @@
     el.className = 'photo';
     el.dataset.label = '갤러리 ' + (lbIndex + 1);
     stage.appendChild(el);
-    fillPhoto(el, C.images.gallery[lbIndex]);
+    fillPhoto(el, C.images.gallery[lbIndex], true, 'large');
+    // 옆 사진을 미리 받아 두어 넘길 때 바로 보이게 한다
+    [lbIndex - 1, lbIndex + 1].forEach(function (j) {
+      new Image().src = sized(C.images.gallery[(j + total) % total], 'large');
+    });
     $('.lightbox__count', lb).textContent = lbIndex + 1 + ' / ' + total;
   }
 

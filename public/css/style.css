@@ -52,6 +52,52 @@ button {
   overflow: hidden;
 }
 
+/* ---------- 첫 화면 로딩 ---------- */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: var(--bg);
+  transition: opacity 0.6s ease;
+}
+
+.loader.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loader__heart {
+  font-size: 30px;
+  line-height: 1;
+  color: var(--accent);
+  animation: loader-beat 1.2s ease-in-out infinite;
+}
+
+.loader__text {
+  font-family: var(--serif);
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  color: var(--text-sub);
+  animation: loader-fade 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes loader-beat {
+  0%, 100% { transform: scale(1); }
+  15% { transform: scale(1.25); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.15); }
+}
+
+@keyframes loader-fade {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+
 /* ---------- 사진 자리 ---------- */
 .photo {
   position: relative;
