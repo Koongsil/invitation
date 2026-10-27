@@ -149,14 +149,29 @@
   $('.lightbox__nav--next', lb).addEventListener('click', function () { showLightbox(lbIndex + 1); });
   lb.addEventListener('click', function (e) { if (e.target === lb) closeLightbox(); });
 
+  // 스와이프로 사진 넘기기. 두 손가락(핀치 확대) 제스처나
+  // 확대된 상태에서 사진을 끌어 움직이는 동작은 넘김으로 처리하지 않음
   var touchX = null;
-  lb.addEventListener('touchstart', function (e) { touchX = e.touches[0].clientX; }, { passive: true });
+  var multiTouch = false;
+  function isZoomed() {
+    return window.visualViewport && window.visualViewport.scale > 1.01;
+  }
+  lb.addEventListener('touchstart', function (e) {
+    if (e.touches.length > 1) multiTouch = true;
+    touchX = multiTouch ? null : e.touches[0].clientX;
+  }, { passive: true });
   lb.addEventListener('touchend', function (e) {
-    if (touchX === null) return;
-    var dx = e.changedTouches[0].clientX - touchX;
-    if (Math.abs(dx) > 50) showLightbox(lbIndex + (dx < 0 ? 1 : -1));
-    touchX = null;
+    if (e.touches.length === 0) {
+      var startX = touchX;
+      var wasMulti = multiTouch;
+      touchX = null;
+      multiTouch = false;
+      if (startX === null || wasMulti || isZoomed()) return;
+      var dx = e.changedTouches[0].clientX - startX;
+      if (Math.abs(dx) > 50) showLightbox(lbIndex + (dx < 0 ? 1 : -1));
+    }
   });
+  lb.addEventListener('touchcancel', function () { touchX = null; multiTouch = false; });
   document.addEventListener('keydown', function (e) {
     if (lb.hidden) return;
     if (e.key === 'Escape') closeLightbox();
