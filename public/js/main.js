@@ -444,7 +444,7 @@
     var W = 192, H = 132;
     var seam = function (x) { return 46 + Math.floor(Math.abs(96 - x) / 2); };
     var MAX_GUESTS = 10;
-    var MAX_TALKING = 2;
+    var MAX_TALKING = 4;
     var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     var chars = [];
     var visible = false;
@@ -535,17 +535,17 @@
         if (c.state === 'walk') c.el.classList.remove('is-walking');
         if (c.state !== 'idle' || still) {
           c.state = 'idle';
-          c.until = now + 1200 + Math.random() * 2800;
+          c.until = now + 800 + Math.random() * 1800;
           place(c);
         } else {
           walk(c, now);
         }
       });
-      // 늘 2명이 말하도록, 서 있는 사람 중 가장 오래 말 안 한 사람부터 (말풍선이 겹치는 자리면 다음 사람)
+      // 늘 MAX_TALKING 명이 말하도록, 서 있는 사람 중 가장 오래 말 안 한 사람부터 (말풍선이 겹치는 자리면 다음 사람)
       var talking = chars.filter(function (c) { return c.state === 'talk'; }).length;
       if (talking >= MAX_TALKING) return;
       chars
-        .filter(function (c) { return c.state === 'idle' && now - c.lastTalk > 1500; })
+        .filter(function (c) { return c.state === 'idle' && now - c.lastTalk > 500; })
         .sort(function (a, b) { return a.lastTalk - b.lastTalk; })
         .some(function (c) {
           if (crowded(c)) return false;
