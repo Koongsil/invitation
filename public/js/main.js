@@ -140,14 +140,32 @@
 
   // ---------- 갤러리 + 라이트박스 ----------
   var gallery = $('#gallery');
+  var hiddenThumbs = [];
   C.images.gallery.forEach(function (src, i) {
     var el = document.createElement('div');
     el.className = 'photo';
     el.dataset.label = '갤러리 ' + (i + 1);
     el.addEventListener('click', function () { openLightbox(i); });
     gallery.appendChild(el);
-    fillPhoto(el, src, false, 'thumb');
+    var img = fillPhoto(el, src, false, 'thumb');
+    if (i >= 9) hiddenThumbs.push(img);
   });
+
+  // More 뒤에 숨은 사진은 lazy라서 펼치기 전엔 받지 않는다.
+  // 갤러리가 화면에 들어오면(앞 9장 요청 후) 미리 받아 두어 More를 누르면 바로 보이게 한다
+  function preloadHiddenThumbs() {
+    hiddenThumbs.forEach(function (img) { img.loading = 'eager'; });
+  }
+  if ('IntersectionObserver' in window) {
+    var galleryIo = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      galleryIo.disconnect();
+      preloadHiddenThumbs();
+    });
+    galleryIo.observe(gallery);
+  } else {
+    preloadHiddenThumbs();
+  }
 
   var galleryMore = $('#galleryMore');
   if (C.images.gallery.length > 9) {
@@ -172,7 +190,33 @@
     el.className = 'photo';
     el.dataset.label = '갤러리 ' + (lbIndex + 1);
     stage.appendChild(el);
-    fillPhoto(el, C.images.gallery[lbIndex], true, 'large');
+    var src = C.images.gallery[lbIndex];
+    // 갤러리에서 이미 받아 둔 축소본을 먼저 깔아 빈 화면 없이 바로 보여 주고,
+    // 큰 사진이 다 받아지면 그 위로 서서히 겹쳐 띄운다
+    var thumb = new Image();
+    thumb.alt = '';
+    thumb.onerror = function () { thumb.remove(); };
+    thumb.src = sized(src, 'thumb');
+    el.appendChild(thumb);
+    var full = new Image();
+    var url = sized(src, 'large');
+    full.alt = '';
+    full.className = 'lightbox__full';
+    full.decoding = 'async';
+    full.fetchPriority = 'high';
+    full.onload = function () { full.classList.add('is-loaded'); };
+    full.onerror = function () {
+      if (url !== src) {
+        url = src;
+        full.src = src;
+      } else {
+        full.remove();
+      }
+    };
+    full.src = url;
+    // 이미 받아 둔 사진이면 서서히 띄우지 않고 바로 보여 준다
+    if (full.complete && full.naturalWidth) full.classList.add('is-loaded', 'is-instant');
+    el.appendChild(full);
     // 옆 사진을 미리 받아 두어 넘길 때 바로 보이게 한다
     [lbIndex - 1, lbIndex + 1].forEach(function (j) {
       new Image().src = sized(C.images.gallery[(j + total) % total], 'large');
