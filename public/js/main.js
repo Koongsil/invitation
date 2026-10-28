@@ -287,7 +287,7 @@
   // ---------- 계좌 ----------
   $$('.accordion').forEach(function (acc) {
     var list = C.accounts[acc.dataset.side] || [];
-    var body = $('.accordion__body', acc);
+    var body = $('.accordion__inner', acc);
     list.forEach(function (a) {
       var row = document.createElement('div');
       row.className = 'account__row';
@@ -300,8 +300,9 @@
       });
       body.appendChild(row);
     });
-    $('.accordion__head', acc).addEventListener('click', function () {
-      acc.classList.toggle('is-open');
+    var head = $('.accordion__head', acc);
+    head.addEventListener('click', function () {
+      head.setAttribute('aria-expanded', acc.classList.toggle('is-open'));
     });
   });
 
